@@ -1,4 +1,4 @@
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -7,9 +7,6 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "ANTHROPIC_KEY not set" });
   }
   const { prompt, system, max_tokens } = req.body;
-  if (!prompt) {
-    return res.status(400).json({ error: "prompt is required" });
-  }
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -31,4 +28,4 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-};
+}
