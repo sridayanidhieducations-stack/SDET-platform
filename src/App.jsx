@@ -164,6 +164,8 @@ function Splash() {
 // ─── LOGIN PAGE ───────────────────────────────────────────────────────────────
 function LoginPage() {
   const [modal, setModal] = useState(null);
+  const w = useWindowWidth();
+  const mob = isMob(w);
 
   const login = () => supabase.auth.signInWithOAuth({
     provider: "google",
@@ -353,9 +355,7 @@ function LoginPage() {
   );
 }
 
-function LoginNav({ setModal }) {
-  const w = useWindowWidth();
-  const mob = isMob(w);
+function LoginNav({ setModal, mob }) {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: mob ? "12px 16px" : "16px 48px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
@@ -400,11 +400,10 @@ function LoginNav({ setModal }) {
   );
 }
 
-function LoginBody({ login }) {
-  const w = useWindowWidth();
-  const mob = isMob(w);
+function LoginBody({ login, mob }) {
   return (
-      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: mob ? "column" : "row", alignItems: mob ? "stretch" : "center", padding: mob ? "24px 16px" : "40px 48px", gap: mob ? 24 : 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", alignItems: "stretch", padding: mob ? "20px 16px 24px" : "40px 48px", gap: mob ? 20 : 48, maxWidth: mob ? "100%" : 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
+      {!mob && <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 48, flex: 1 }}>
 
         {/* Left — Hero */}
         <div style={{ flex: 1 }}>
@@ -439,8 +438,8 @@ function LoginBody({ login }) {
           </div>}
         </div>
 
-        {/* Right — Login Card */}
-        <div style={{ width: mob ? "100%" : 380, flexShrink: 0 }}>
+        {/* Right — Login Card — Desktop */}
+        <div style={{ width: 380, flexShrink: 0 }}>
           <div style={{ background: "#fff", borderRadius: 20, padding: "36px 32px", boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}>
             {/* Card Header */}
             <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -496,6 +495,49 @@ function LoginBody({ login }) {
             <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>© 2026 Sri Dayanidhi Educational Trust</span>
           </div>
         </div>
+      </div>}
+
+      {/* Mobile: hero then card stacked */}
+      {mob && <>
+        <div>
+          <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 12, letterSpacing: 1 }}>EST. — BENGALURU</div>
+          <h1 style={{ margin: "0 0 6px", fontSize: 30, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi<br/>Educational Trust</h1>
+          <h2 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>SDET Learning Platform</h2>
+          <div style={{ display: "flex", gap: 24, marginBottom: 16 }}>
+            {[["500+","Students"],["15+","Courses"],["3","Boards"]].map(([n,l]) => (
+              <div key={l}><div style={{ fontSize: 22, fontWeight: 900, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>{n}</div><div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{l}</div></div>
+            ))}
+          </div>
+        </div>
+        <div style={{ background: "#fff", borderRadius: 20, padding: "28px 20px", boxShadow: "0 12px 40px rgba(0,0,0,0.4)" }}>
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <div style={{ width: 48, height: 48, borderRadius: "50%", background: C.navy, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>{icons.logo(26)}</div>
+            <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Welcome Back</div>
+            <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800, color: C.navy, fontFamily: "'Playfair Display',serif" }}>Sign in to SDET</h3>
+            <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Access your learning dashboard</p>
+          </div>
+          <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 20 }} />
+          <button onClick={login}
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "14px 20px", background: "#fff", border: `1.5px solid ${C.border}`, borderRadius: 12, fontSize: 15, fontWeight: 700, color: C.navy, cursor: "pointer", fontFamily: "inherit", boxSizing: "border-box" }}>
+            {icons.google(22)} Continue with Google
+          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "16px 0" }}>
+            <div style={{ flex: 1, height: 1, background: C.border }} />
+            <span style={{ fontSize: 12, color: C.muted }}>SDET Portal</span>
+            <div style={{ flex: 1, height: 1, background: C.border }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+            {[{icon:"🎓",title:"Students",desc:"Worksheets & progress"},{icon:"📋",title:"Teachers",desc:"Classes & AI evaluation"}].map(item => (
+              <div key={item.title} style={{ background: "#f8f9ff", border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px" }}>
+                <div style={{ fontSize: 18, marginBottom: 4 }}>{item.icon}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{item.title}</div>
+                <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.4, marginTop: 2 }}>{item.desc}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ margin: 0, fontSize: 11, color: C.muted, textAlign: "center", lineHeight: 1.7 }}>By signing in you agree to SDET's terms.</p>
+        </div>
+      </>}
       </div>
 
       {/* Footer bar */}
