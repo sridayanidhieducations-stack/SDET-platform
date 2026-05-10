@@ -248,6 +248,7 @@ function TeacherApp({ profile, onRefresh }) {
     { id: "worksheets", label: "Worksheets", icon: icons.worksheet },
     { id: "submissions", label: "Submissions", icon: icons.submit },
     { id: "progress", label: "Progress", icon: icons.chart },
+    { id: "profile", label: "My Profile", icon: icons.phone },
     ...(profile.role === "admin" ? [{ id: "teachers", label: "Teachers", icon: icons.teacher }] : []),
   ];
 
@@ -292,6 +293,7 @@ function TeacherApp({ profile, onRefresh }) {
         {tab === "worksheets" && <WorksheetsView worksheets={worksheets} courses={courses} profile={profile} onRefresh={loadAll} />}
         {tab === "submissions" && <SubmissionsView submissions={submissions} worksheets={worksheets} onRefresh={loadAll} />}
         {tab === "progress" && <ProgressView students={students} submissions={submissions} />}
+        {tab === "profile" && <TeacherProfile profile={profile} onRefresh={onRefresh} />}
         {tab === "teachers" && <TeachersView profile={profile} />}
       </main>
     </div>
@@ -1029,6 +1031,166 @@ function StudentWorksheets({ worksheets, submissions, profile, onRefresh }) {
         {worksheets.length === 0 && (
           <p style={{ color: C.muted, textAlign: "center", padding: 32 }}>No worksheets shared yet. Check back soon!</p>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ─── TEACHER PROFILE ──────────────────────────────────────────────────────────
+function TeacherProfile({ profile, onRefresh }) {
+  const [form, setForm] = useState({
+    full_name: profile.full_name || "",
+    phone: profile.phone || "",
+    subject: profile.subject || "",
+    bio: profile.bio || "",
+    education: profile.education || "",
+    experience: profile.experience || "",
+    linkedin: profile.linkedin || "",
+    avatar_url: profile.avatar_url || "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(profile.avatar_url || "");
+
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    // Convert to base64 data URL for preview and storage
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const dataUrl = ev.target.result;
+      setPreviewUrl(dataUrl);
+      set("avatar_url", dataUrl);
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const useGooglePhoto = () => {
+    const googleAvatar = profile.avatar_url;
+    if (googleAvatar) {
+      setPreviewUrl(googleAvatar);
+      set("avatar_url", googleAvatar);
+    }
+  };
+
+  const save = async () => {
+    setSaving(true);
+    await supabase.from("profiles").update({
+      full_name: form.full_name,
+      phone: form.phone,
+      subject: form.subject,
+      bio: form.bio,
+      education: form.education,
+      experience: form.experience,
+      linkedin: form.linkedin,
+      avatar_url: form.avatar_url,
+    }).eq("id", profile.id);
+    setSaving(false);
+    setSaved(true);
+    onRefresh();
+    setTimeout(() => setSaved(false), 3000);
+  };
+
+  const fields = [
+    { key: "full_name", label: "Full Name", placeholder: "e.g. Arun Kumar MN", type: "text" },
+    { key: "phone", label: "Phone Number", placeholder: "e.g. +91 98765 43210", type: "text" },
+    { key: "subject", label: "Subject Specialization", placeholder: "e.g. Physics, Mathematics", type: "text" },
+    { key: "experience", label: "Years of Experience", placeholder: "e.g. 8 years", type: "text" },
+    { key: "education", label: "Education Qualifications", placeholder: "e.g. M.Sc Physics, B.Ed from Bangalore University", type: "textarea" },
+    { key: "bio", label: "About Me / Bio", placeholder: "Tell students about yourself, your teaching style, achievements…", type: "textarea" },
+    { key: "linkedin", label: "LinkedIn Profile URL (Optional)", placeholder: "https://linkedin.com/in/yourname", type: "text" },
+  ];
+
+  return (
+    <div style={{ maxWidth: 720 }}>
+      <h2 style={{ margin: "0 0 8px", fontFamily: "'Playfair Display',serif", color: C.navy, fontSize: 26 }}>My Profile</h2>
+      <p style={{ margin: "0 0 28px", color: C.muted, fontSize: 14 }}>Update your profile details. Students and admins can see this information.</p>
+
+      {/* Photo Section */}
+      <div style={{ ...card, marginBottom: 20, display: "flex", alignItems: "center", gap: 24 }}>
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          {previewUrl ? (
+            <img src={previewUrl} alt="Profile" style={{ width: 90, height: 90, borderRadius: "50%", objectFit: "cover", border: `3px solid ${C.gold}` }} />
+          ) : (
+            <div style={{ width: 90, height: 90, borderRadius: "50%", background: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 700, color: "#1d4ed8", border: `3px solid ${C.gold}` }}>
+              {profile.full_name?.[0]}
+            </div>
+          )}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, color: C.text, marginBottom: 6 }}>Profile Photo</div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <label style={{ ...btn("primary"), padding: "8px 16px", fontSize: 13, cursor: "pointer" }}>
+              {uploading ? "Uploading…" : "📁 Upload Photo"}
+              <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: "none" }} />
+            </label>
+            <button onClick={useGooglePhoto} style={{ ...btn("outline"), padding: "8px 16px", fontSize: 13 }}>
+              {icons.google(14)} Use Google Photo
+            </button>
+          </div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 8 }}>Upload a clear photo or use your Google account photo.</div>
+        </div>
+      </div>
+
+      {/* Form Fields */}
+      <div style={{ ...card, display: "flex", flexDirection: "column", gap: 20 }}>
+        {fields.map((f) => (
+          <div key={f.key}>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 8 }}>{f.label}</label>
+            {f.type === "textarea" ? (
+              <textarea
+                value={form[f.key]}
+                onChange={(e) => set(f.key, e.target.value)}
+                placeholder={f.placeholder}
+                rows={3}
+                style={{ ...inp, resize: "vertical" }}
+              />
+            ) : (
+              <input
+                type={f.type}
+                value={form[f.key]}
+                onChange={(e) => set(f.key, e.target.value)}
+                placeholder={f.placeholder}
+                style={inp}
+              />
+            )}
+          </div>
+        ))}
+
+        <div style={{ display: "flex", alignItems: "center", gap: 16, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
+          <button onClick={save} disabled={saving} style={{ ...btn("gold"), opacity: saving ? 0.7 : 1 }}>
+            {saving ? "Saving…" : "💾 Save Profile"}
+          </button>
+          {saved && (
+            <span style={{ color: C.green, fontWeight: 700, fontSize: 14 }}>✓ Profile saved successfully!</span>
+          )}
+        </div>
+      </div>
+
+      {/* Profile Preview */}
+      <div style={{ ...card, marginTop: 20, background: "linear-gradient(135deg,#1a2744 0%,#0f3460 100%)", border: "none" }}>
+        <div style={{ color: "#f59e0b", fontWeight: 700, fontSize: 14, marginBottom: 16 }}>👁 How students see your profile</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
+          {previewUrl ? (
+            <img src={previewUrl} alt="Profile" style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", border: "2px solid #f59e0b" }} />
+          ) : (
+            <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 700, color: "#1d4ed8" }}>
+              {profile.full_name?.[0]}
+            </div>
+          )}
+          <div>
+            <div style={{ color: "#f0f9ff", fontWeight: 700, fontSize: 18 }}>{form.full_name || profile.full_name}</div>
+            <div style={{ color: "#94a3b8", fontSize: 13 }}>{form.subject || "Subject not set"} · {form.experience || "Experience not set"}</div>
+          </div>
+        </div>
+        {form.education && <div style={{ color: "#cbd5e1", fontSize: 13, marginBottom: 8 }}>🎓 {form.education}</div>}
+        {form.bio && <div style={{ color: "#cbd5e1", fontSize: 13, lineHeight: 1.7 }}>{form.bio}</div>}
+        {form.linkedin && <div style={{ marginTop: 10 }}><a href={form.linkedin} target="_blank" rel="noreferrer" style={{ color: "#60a5fa", fontSize: 13 }}>🔗 LinkedIn Profile</a></div>}
       </div>
     </div>
   );
