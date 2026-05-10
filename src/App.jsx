@@ -164,8 +164,7 @@ function Splash() {
 // ─── LOGIN PAGE ───────────────────────────────────────────────────────────────
 function LoginPage() {
   const [modal, setModal] = useState(null);
-  const w = useWindowWidth();
-  const mob = isMob(w);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const login = () => supabase.auth.signInWithOAuth({
     provider: "google",
@@ -186,13 +185,13 @@ function LoginPage() {
             <div style={{ background: "#f0f9ff", borderRadius: 12, padding: 16 }}>
               <div style={{ fontWeight: 700, color: C.navy, marginBottom: 8, fontSize: 13 }}>🎯 Our Mission</div>
               {["Empower students with confidence and knowledge", "Help students discover their abilities", "Provide quality education with personal guidance", "Create a positive learning environment"].map((m, i) => (
-                <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, paddingLeft: 10, borderLeft: `2px solid #d4a017`, marginBottom: 6 }}>{m}</div>
+                <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, paddingLeft: 10, borderLeft: "2px solid #d4a017", marginBottom: 6 }}>{m}</div>
               ))}
             </div>
             <div style={{ background: "#f0fdf4", borderRadius: 12, padding: 16 }}>
               <div style={{ fontWeight: 700, color: C.navy, marginBottom: 8, fontSize: 13 }}>✅ Why Choose SDET?</div>
               {["Experienced & student-friendly faculty", "Individual attention and mentoring", "Focus on academic excellence", "Supportive growth environment", "Improves confidence & performance"].map((m, i) => (
-                <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, paddingLeft: 10, borderLeft: `2px solid #059669`, marginBottom: 6 }}>{m}</div>
+                <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, paddingLeft: 10, borderLeft: "2px solid #059669", marginBottom: 6 }}>{m}</div>
               ))}
             </div>
           </div>
@@ -247,9 +246,7 @@ function LoginPage() {
                 { subject: "Commerce", color: "#fef3c7", text: "#92400e" },
               ].map((t, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#fff", borderRadius: 8, border: `1px solid ${C.border}` }}>
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: t.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: t.text, flexShrink: 0 }}>
-                    {t.subject[0]}
-                  </div>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: t.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: t.text, flexShrink: 0 }}>{t.subject[0]}</div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>Mr./Mrs. __________</div>
                     <div style={{ fontSize: 12, color: C.muted }}>{t.subject} Teacher</div>
@@ -294,38 +291,75 @@ function LoginPage() {
     },
   };
 
+  const LoginCard = () => (
+    <div style={{ background: "#fff", borderRadius: 20, padding: "32px 28px", boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ width: 52, height: 52, borderRadius: "50%", background: C.navy, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>{icons.logo(28)}</div>
+        <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Welcome Back</div>
+        <h3 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800, color: C.navy, fontFamily: "'Playfair Display',serif" }}>Sign in to SDET</h3>
+        <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Access your learning dashboard</p>
+      </div>
+      <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 20 }} />
+      <button onClick={login}
+        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "14px 20px", background: "#fff", border: `1.5px solid ${C.border}`, borderRadius: 12, fontSize: 15, fontWeight: 700, color: C.navy, cursor: "pointer", fontFamily: "inherit", boxSizing: "border-box" }}>
+        {icons.google(22)} Continue with Google
+      </button>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "16px 0" }}>
+        <div style={{ flex: 1, height: 1, background: C.border }} />
+        <span style={{ fontSize: 12, color: C.muted }}>SDET Portal</span>
+        <div style={{ flex: 1, height: 1, background: C.border }} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+        {[{ icon: "🎓", title: "Students", desc: "Worksheets & progress" }, { icon: "📋", title: "Teachers", desc: "Classes & AI evaluation" }].map(item => (
+          <div key={item.title} style={{ background: "#f8f9ff", border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 18, marginBottom: 4 }}>{item.icon}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{item.title}</div>
+            <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.4, marginTop: 2 }}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+      <p style={{ margin: 0, fontSize: 11, color: C.muted, textAlign: "center", lineHeight: 1.7 }}>
+        By signing in you agree to SDET's terms.<br />
+        New students will be asked for their phone number after sign-in.
+      </p>
+    </div>
+  );
+
   return (
     <div style={{ minHeight: "100vh", background: C.navy, fontFamily: "'Lato',sans-serif", display: "flex", flexDirection: "column" }}>
       <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+      <style>{`
+        @media (max-width: 767px) {
+          .sdet-desktop { display: none !important; }
+          .sdet-mobile { display: flex !important; }
+          .sdet-hamburger { display: flex !important; }
+          .sdet-nav-links { display: none !important; }
+        }
+        @media (min-width: 768px) {
+          .sdet-mobile { display: none !important; }
+          .sdet-hamburger { display: none !important; }
+        }
+        .sdet-mobile { display: none; flex-direction: column; }
+        .sdet-hamburger { display: none; }
+      `}</style>
 
-      {/* Modal Overlay */}
+      {/* Modal */}
       {modal && (
-        <div
-          onClick={() => setModal(null)}
-          style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 680, maxHeight: "85vh", overflowY: "auto", boxShadow: "0 32px 80px rgba(0,0,0,0.4)" }}
-          >
+        <div onClick={() => setModal(null)} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 680, maxHeight: "85vh", overflowY: "auto", boxShadow: "0 32px 80px rgba(0,0,0,0.4)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 28px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, background: "#fff", zIndex: 1, borderRadius: "20px 20px 0 0" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <span style={{ fontSize: 24 }}>{modalContent[modal].icon}</span>
                 <h2 style={{ margin: 0, fontSize: 20, fontFamily: "'Playfair Display',serif", color: C.navy }}>{modalContent[modal].title}</h2>
               </div>
-              <button
-                onClick={() => setModal(null)}
-                style={{ background: "#f1f5f9", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", fontSize: 18, color: C.muted, display: "flex", alignItems: "center", justifyContent: "center" }}
-              >×</button>
+              <button onClick={() => setModal(null)} style={{ background: "#f1f5f9", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", fontSize: 18, color: C.muted, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
             </div>
-            <div style={{ padding: "24px 28px" }}>
-              {modalContent[modal].content}
-            </div>
+            <div style={{ padding: "24px 28px" }}>{modalContent[modal].content}</div>
           </div>
         </div>
       )}
 
-      {/* Background building illustration */}
+      {/* Background */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden" }}>
         <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" style={{ width: "100%", height: "100%", opacity: 0.08 }}>
           <rect x="180" y="120" width="1080" height="680" rx="4" fill="none" stroke="#fff" strokeWidth="2"/>
@@ -346,54 +380,28 @@ function LoginPage() {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(26,39,68,0.85) 0%, rgba(26,39,68,0.7) 60%, rgba(26,39,68,0.92) 100%)" }} />
       </div>
 
-      {/* Navigation Bar */}
-      <LoginNav setModal={setModal} />
-
-      {/* Main Body */}
-      <LoginBody login={login} />
-    </div>
-  );
-}
-
-function LoginNav({ setModal, mob }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  return (
-    <>
-      <style>{`
-        @media (max-width: 767px) {
-          .sdet-nav-links { display: none !important; }
-          .sdet-hamburger { display: flex !important; }
-          .sdet-nav { padding: 12px 16px !important; }
-          .sdet-nav-subtitle { display: none !important; }
-          .sdet-login-desktop { display: none !important; }
-          .sdet-login-mobile { display: flex !important; }
-        }
-        @media (min-width: 768px) {
-          .sdet-hamburger { display: none !important; }
-          .sdet-login-mobile { display: none !important; }
-          .sdet-login-desktop { display: flex !important; }
-        }
-        .sdet-login-mobile { display: none; flex-direction: column; }
-      `}</style>
-      <nav className="sdet-nav" style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
+      {/* Nav */}
+      <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {icons.logo(32)}
+          {icons.logo(30)}
           <div>
-            <div style={{ color: "#fff", fontWeight: 700, fontSize: 15, fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi Educational Trust</div>
-            <div className="sdet-nav-subtitle" style={{ color: "#d4a017", fontSize: 11, fontWeight: 400, letterSpacing: 1 }}>Bengaluru, Karnataka</div>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: 14, fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi Educational Trust</div>
+            <div style={{ color: "#d4a017", fontSize: 10, fontWeight: 400, letterSpacing: 1 }}>Bengaluru, Karnataka</div>
           </div>
         </div>
+        {/* Desktop nav links */}
         <div className="sdet-nav-links" style={{ display: "flex", gap: 32 }}>
-          {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
+          {["About Us", "Courses", "Teachers", "Contact"].map(item => (
             <span key={item} onClick={() => setModal(item)}
-              style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer", fontWeight: 400, letterSpacing: 0.3 }}
+              style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer" }}
               onMouseEnter={e => e.target.style.color = "#d4a017"}
               onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.7)"}>
               {item}
             </span>
           ))}
         </div>
-        <div className="sdet-hamburger" style={{ display: "none", position: "relative", flexDirection: "column" }}>
+        {/* Mobile hamburger */}
+        <div className="sdet-hamburger" style={{ position: "relative" }}>
           <button onClick={() => setMenuOpen(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", flexDirection: "column", gap: 5 }}>
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
@@ -401,7 +409,7 @@ function LoginNav({ setModal, mob }) {
           </button>
           {menuOpen && (
             <div style={{ position: "absolute", right: 0, top: 48, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 180, zIndex: 100, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
-              {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
+              {["About Us", "Courses", "Teachers", "Contact"].map(item => (
                 <div key={item} onClick={() => { setModal(item); setMenuOpen(false); }}
                   style={{ padding: "14px 20px", color: "rgba(255,255,255,0.85)", fontSize: 15, cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   {item}
@@ -411,153 +419,48 @@ function LoginNav({ setModal, mob }) {
           )}
         </div>
       </nav>
-    </>
-  );
-}
 
-function LoginBody({ login, mob }) {
-  return (
-      <div style={{ position: "relative", zIndex: 2, flex: 1, width: "100%", boxSizing: "border-box" }}>
-      <div className="sdet-login-desktop" style={{ flexDirection: "row", alignItems: "center", gap: 48, flex: 1, padding: "40px 48px", maxWidth: 1200, margin: "0 auto" }}>
-
-        {/* Left — Hero */}
+      {/* Desktop layout */}
+      <div className="sdet-desktop" style={{ position: "relative", zIndex: 2, flex: 1, flexDirection: "row", alignItems: "center", padding: "40px 48px", gap: 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
         <div style={{ flex: 1 }}>
-          <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: mob ? 12 : 20, letterSpacing: 1 }}>
-            EST. — BENGALURU
-          </div>
-          <h1 style={{ margin: "0 0 6px", fontSize: mob ? 28 : 42, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.15 }}>
-            Sri Dayanidhi<br />Educational Trust
-          </h1>
-          <h2 style={{ margin: "0 0 12px", fontSize: mob ? 15 : 18, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>
-            SDET Learning Platform
-          </h2>
-          {!mob && <p style={{ margin: "0 0 36px", color: "rgba(255,255,255,0.65)", fontSize: 15, lineHeight: 1.8, maxWidth: 420 }}>
-            Empowering students across ICSE, ISC, CBSE and Karnataka State Board with expert-led Physics, Mathematics, Chemistry and more.
-          </p>}
-
-          {/* Stats */}
-          <div style={{ display: "flex", gap: mob ? 20 : 40, marginBottom: mob ? 14 : 0 }}>
-            {[["500+", "Students"], ["15+", "Courses"], ["3", "Boards"]].map(([num, label]) => (
-              <div key={label}>
-                <div style={{ fontSize: mob ? 20 : 28, fontWeight: 900, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>{num}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{label}</div>
-              </div>
+          <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 20, letterSpacing: 1 }}>EST. — BENGALURU</div>
+          <h1 style={{ margin: "0 0 6px", fontSize: 42, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.15 }}>Sri Dayanidhi<br />Educational Trust</h1>
+          <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>SDET Learning Platform</h2>
+          <p style={{ margin: "0 0 36px", color: "rgba(255,255,255,0.65)", fontSize: 15, lineHeight: 1.8, maxWidth: 420 }}>Empowering students across ICSE, ISC, CBSE and Karnataka State Board with expert-led Physics, Mathematics, Chemistry and more.</p>
+          <div style={{ display: "flex", gap: 40 }}>
+            {[["500+","Students"],["15+","Courses"],["3","Boards"]].map(([n,l]) => (
+              <div key={l}><div style={{ fontSize: 28, fontWeight: 900, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>{n}</div><div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{l}</div></div>
             ))}
           </div>
-
-          {/* Board badges */}
-          {!mob && <div style={{ display: "flex", gap: 10, marginTop: 28, flexWrap: "wrap" }}>
-            {["ICSE", "ISC", "CBSE", "Karnataka Board"].map((b) => (
+          <div style={{ display: "flex", gap: 10, marginTop: 28, flexWrap: "wrap" }}>
+            {["ICSE","ISC","CBSE","Karnataka Board"].map(b => (
               <span key={b} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)", fontSize: 11, padding: "5px 14px", borderRadius: 20 }}>{b}</span>
             ))}
-          </div>}
-        </div>
-
-        {/* Right — Login Card — Desktop */}
-        <div style={{ width: 380, flexShrink: 0, display: "flex", flexDirection: "column" }}>
-          <div style={{ background: "#fff", borderRadius: 20, padding: "36px 32px", boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}>
-            {/* Card Header */}
-            <div style={{ textAlign: "center", marginBottom: 28 }}>
-              <div style={{ width: 56, height: 56, borderRadius: "50%", background: C.navy, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
-                {icons.logo(30)}
-              </div>
-              <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>Welcome Back</div>
-              <h3 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800, color: C.navy, fontFamily: "'Playfair Display',serif" }}>Sign in to SDET</h3>
-              <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Access your learning dashboard</p>
-            </div>
-
-            <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 24 }} />
-
-            {/* Google Sign In */}
-            <button
-              onClick={login}
-              style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "14px 20px", background: "#fff", border: `1.5px solid ${C.border}`, borderRadius: 12, fontSize: 15, fontWeight: 700, color: C.navy, cursor: "pointer", fontFamily: "inherit", boxSizing: "border-box" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = C.navy; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.borderColor = C.border; }}
-            >
-              {icons.google(22)} Continue with Google
-            </button>
-
-            {/* Divider */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
-              <div style={{ flex: 1, height: 1, background: C.border }} />
-              <span style={{ fontSize: 12, color: C.muted }}>SDET Portal</span>
-              <div style={{ flex: 1, height: 1, background: C.border }} />
-            </div>
-
-            {/* Info boxes */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
-              {[
-                { icon: "🎓", title: "Students", desc: "Access worksheets & track progress" },
-                { icon: "📋", title: "Teachers", desc: "Manage classes & AI evaluation" },
-              ].map((item) => (
-                <div key={item.title} style={{ background: "#f8f9ff", border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 18, marginBottom: 4 }}>{item.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{item.title}</div>
-                  <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.4, marginTop: 2 }}>{item.desc}</div>
-                </div>
-              ))}
-            </div>
-
-            <p style={{ margin: 0, fontSize: 11, color: C.muted, textAlign: "center", lineHeight: 1.7 }}>
-              By signing in you agree to SDET's terms.<br />
-              New students will be asked for their phone number after sign-in.
-            </p>
-          </div>
-
-          {/* Below card */}
-          <div style={{ textAlign: "center", marginTop: 16 }}>
-            <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>© 2026 Sri Dayanidhi Educational Trust</span>
           </div>
         </div>
-      </div>}
+        <div style={{ width: 380, flexShrink: 0 }}><LoginCard /></div>
+      </div>
 
-      {/* Mobile: hero then card stacked */}
-      <div className="sdet-login-mobile" style={{ flexDirection: "column", padding: "20px 16px 32px", gap: 20 }}>
+      {/* Mobile layout */}
+      <div className="sdet-mobile" style={{ position: "relative", zIndex: 2, padding: "20px 16px 32px", gap: 24, flex: 1 }}>
         <div>
           <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 12, letterSpacing: 1 }}>EST. — BENGALURU</div>
           <h1 style={{ margin: "0 0 6px", fontSize: 30, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi<br/>Educational Trust</h1>
           <h2 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>SDET Learning Platform</h2>
-          <div style={{ display: "flex", gap: 24, marginBottom: 16 }}>
+          <div style={{ display: "flex", gap: 24, marginBottom: 8 }}>
             {[["500+","Students"],["15+","Courses"],["3","Boards"]].map(([n,l]) => (
               <div key={l}><div style={{ fontSize: 22, fontWeight: 900, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>{n}</div><div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{l}</div></div>
             ))}
           </div>
         </div>
-        <div style={{ background: "#fff", borderRadius: 20, padding: "28px 20px", boxShadow: "0 12px 40px rgba(0,0,0,0.4)" }}>
-          <div style={{ textAlign: "center", marginBottom: 20 }}>
-            <div style={{ width: 48, height: 48, borderRadius: "50%", background: C.navy, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>{icons.logo(26)}</div>
-            <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Welcome Back</div>
-            <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800, color: C.navy, fontFamily: "'Playfair Display',serif" }}>Sign in to SDET</h3>
-            <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Access your learning dashboard</p>
-          </div>
-          <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 20 }} />
-          <button onClick={login}
-            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "14px 20px", background: "#fff", border: `1.5px solid ${C.border}`, borderRadius: 12, fontSize: 15, fontWeight: 700, color: C.navy, cursor: "pointer", fontFamily: "inherit", boxSizing: "border-box" }}>
-            {icons.google(22)} Continue with Google
-          </button>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "16px 0" }}>
-            <div style={{ flex: 1, height: 1, background: C.border }} />
-            <span style={{ fontSize: 12, color: C.muted }}>SDET Portal</span>
-            <div style={{ flex: 1, height: 1, background: C.border }} />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-            {[{icon:"🎓",title:"Students",desc:"Worksheets & progress"},{icon:"📋",title:"Teachers",desc:"Classes & AI evaluation"}].map(item => (
-              <div key={item.title} style={{ background: "#f8f9ff", border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px" }}>
-                <div style={{ fontSize: 18, marginBottom: 4 }}>{item.icon}</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{item.title}</div>
-                <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.4, marginTop: 2 }}>{item.desc}</div>
-              </div>
-            ))}
-          </div>
-          <p style={{ margin: 0, fontSize: 11, color: C.muted, textAlign: "center", lineHeight: 1.7 }}>By signing in you agree to SDET's terms.</p>
+        <LoginCard />
+        <div style={{ textAlign: "center" }}>
+          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>© 2026 Sri Dayanidhi Educational Trust</span>
         </div>
       </div>
-      </div>
-      </div>
 
-      {/* Footer bar */}
-      <div style={{ position: "relative", zIndex: 2, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      {/* Footer — desktop */}
+      <div className="sdet-desktop" style={{ position: "relative", zIndex: 2, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 48px", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>sdet-platform.vercel.app</span>
         <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>Physics · Mathematics · Chemistry · Biology · English</span>
       </div>
