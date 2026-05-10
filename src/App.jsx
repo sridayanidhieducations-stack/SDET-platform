@@ -8,6 +8,19 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+
+// ─── Responsive Hook ──────────────────────────────────────────────────────────
+function useWindowWidth() {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handle = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handle);
+    return () => window.removeEventListener("resize", handle);
+  }, []);
+  return width;
+}
+const isMob = (w) => w < 768;
+
 // ─── Email Helper ─────────────────────────────────────────────────────────────
 async function sendEmail(to, subject, html) {
   try {
@@ -332,18 +345,49 @@ function LoginPage() {
       </div>
 
       {/* Navigation Bar */}
-      <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {icons.logo(36)}
-          <div>
-            <div style={{ color: "#fff", fontWeight: 700, fontSize: 16, fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi Educational Trust</div>
-            <div style={{ color: "#d4a017", fontSize: 11, fontWeight: 400, letterSpacing: 1 }}>Bengaluru, Karnataka</div>
-          </div>
+      <LoginNav setModal={setModal} />
+
+      {/* Main Body */}
+      <LoginBody login={login} />
+    </div>
+  );
+}
+
+function LoginNav({ setModal }) {
+  const w = useWindowWidth();
+  const mob = isMob(w);
+  const [menuOpen, setMenuOpen] = useState(false);
+  return (
+    <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: mob ? "12px 16px" : "16px 48px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {icons.logo(mob ? 28 : 36)}
+        <div>
+          <div style={{ color: "#fff", fontWeight: 700, fontSize: mob ? 13 : 16, fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi Educational Trust</div>
+          {!mob && <div style={{ color: "#d4a017", fontSize: 11, fontWeight: 400, letterSpacing: 1 }}>Bengaluru, Karnataka</div>}
         </div>
+      </div>
+      {mob ? (
+        <div style={{ position: "relative" }}>
+          <button onClick={() => setMenuOpen(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8 }}>
+            <div style={{ width: 22, height: 2, background: "#fff", marginBottom: 5, borderRadius: 2 }} />
+            <div style={{ width: 22, height: 2, background: "#fff", marginBottom: 5, borderRadius: 2 }} />
+            <div style={{ width: 22, height: 2, background: "#fff", borderRadius: 2 }} />
+          </button>
+          {menuOpen && (
+            <div style={{ position: "absolute", right: 0, top: 44, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 160, zIndex: 10 }}>
+              {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
+                <div key={item} onClick={() => { setModal(item); setMenuOpen(false); }}
+                  style={{ padding: "12px 20px", color: "rgba(255,255,255,0.8)", fontSize: 14, cursor: "pointer" }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
         <div style={{ display: "flex", gap: 32 }}>
           {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
-            <span key={item}
-              onClick={() => setModal(item)}
+            <span key={item} onClick={() => setModal(item)}
               style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer", fontWeight: 400, letterSpacing: 0.3 }}
               onMouseEnter={e => e.target.style.color = "#d4a017"}
               onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.7)"}>
@@ -351,46 +395,52 @@ function LoginPage() {
             </span>
           ))}
         </div>
-      </nav>
+      )}
+    </nav>
+  );
+}
 
-      {/* Main Body */}
-      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", alignItems: "center", padding: "40px 48px", gap: 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
+function LoginBody({ login }) {
+  const w = useWindowWidth();
+  const mob = isMob(w);
+  return (
+      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: mob ? "column" : "row", alignItems: mob ? "stretch" : "center", padding: mob ? "24px 16px" : "40px 48px", gap: mob ? 24 : 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
 
         {/* Left — Hero */}
         <div style={{ flex: 1 }}>
-          <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 20, letterSpacing: 1 }}>
+          <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: mob ? 12 : 20, letterSpacing: 1 }}>
             EST. — BENGALURU
           </div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 42, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.15 }}>
+          <h1 style={{ margin: "0 0 6px", fontSize: mob ? 28 : 42, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.15 }}>
             Sri Dayanidhi<br />Educational Trust
           </h1>
-          <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>
+          <h2 style={{ margin: "0 0 12px", fontSize: mob ? 15 : 18, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>
             SDET Learning Platform
           </h2>
-          <p style={{ margin: "0 0 36px", color: "rgba(255,255,255,0.65)", fontSize: 15, lineHeight: 1.8, maxWidth: 420 }}>
+          {!mob && <p style={{ margin: "0 0 36px", color: "rgba(255,255,255,0.65)", fontSize: 15, lineHeight: 1.8, maxWidth: 420 }}>
             Empowering students across ICSE, ISC, CBSE and Karnataka State Board with expert-led Physics, Mathematics, Chemistry and more.
-          </p>
+          </p>}
 
           {/* Stats */}
-          <div style={{ display: "flex", gap: 40 }}>
+          <div style={{ display: "flex", gap: mob ? 20 : 40, marginBottom: mob ? 14 : 0 }}>
             {[["500+", "Students"], ["15+", "Courses"], ["3", "Boards"]].map(([num, label]) => (
               <div key={label}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>{num}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{label}</div>
+                <div style={{ fontSize: mob ? 20 : 28, fontWeight: 900, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>{num}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{label}</div>
               </div>
             ))}
           </div>
 
           {/* Board badges */}
-          <div style={{ display: "flex", gap: 10, marginTop: 28, flexWrap: "wrap" }}>
+          {!mob && <div style={{ display: "flex", gap: 10, marginTop: 28, flexWrap: "wrap" }}>
             {["ICSE", "ISC", "CBSE", "Karnataka Board"].map((b) => (
               <span key={b} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)", fontSize: 11, padding: "5px 14px", borderRadius: 20 }}>{b}</span>
             ))}
-          </div>
+          </div>}
         </div>
 
         {/* Right — Login Card */}
-        <div style={{ width: 380, flexShrink: 0 }}>
+        <div style={{ width: mob ? "100%" : 380, flexShrink: 0 }}>
           <div style={{ background: "#fff", borderRadius: 20, padding: "36px 32px", boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}>
             {/* Card Header */}
             <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -545,12 +595,39 @@ function TeacherApp({ profile, onRefresh }) {
     ...(profile.role === "admin" ? [{ id: "teachers", label: "Teachers", icon: icons.teacher }] : []),
   ];
 
+  const w = useWindowWidth();
+  const mob = isMob(w);
+
   return (
-    <div style={{ minHeight: "100vh", display: "flex", background: C.bg, fontFamily: "'Lato',sans-serif" }}>
+    <div style={{ minHeight: "100vh", display: "flex", background: C.bg, fontFamily: "'Lato',sans-serif", paddingBottom: mob ? 60 : 0 }}>
       <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
 
-      {/* Sidebar */}
-      <aside style={{ width: 240, background: C.navy, display: "flex", flexDirection: "column", padding: "28px 0", flexShrink: 0, position: "sticky", top: 0, height: "100vh" }}>
+      {/* Mobile top bar */}
+      {mob && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 20, background: C.navy, height: 52, display: "flex", alignItems: "center", padding: "0 16px", justifyContent: "space-between", borderBottom: "1px solid #ffffff18" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {icons.logo(24)}
+            <span style={{ color: "#f59e0b", fontWeight: 900, fontSize: 15, fontFamily: "'Playfair Display',serif" }}>SDET</span>
+          </div>
+          <div style={{ color: "#94a3b8", fontSize: 12 }}>{profile.full_name.split(" ")[0]}</div>
+          <button onClick={logout} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}>{icons.logout(18)}</button>
+        </div>
+      )}
+
+      {/* Mobile bottom tab bar */}
+      {mob && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: C.navy, borderTop: "1px solid #ffffff18", display: "flex", zIndex: 20, height: 60 }}>
+          {navItems.slice(0, 5).map((n) => (
+            <button key={n.id} onClick={() => setTab(n.id)}
+              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 9, fontWeight: tab === n.id ? 700 : 400, background: "transparent", color: tab === n.id ? "#f59e0b" : "#64748b" }}>
+              {n.icon(18)} {n.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Sidebar — desktop only */}
+      <aside style={{ width: 240, background: C.navy, display: mob ? "none" : "flex", flexDirection: "column", padding: "28px 0", flexShrink: 0, position: "sticky", top: 0, height: "100vh" }}>
         <div style={{ padding: "0 24px 28px", borderBottom: "1px solid #ffffff18" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
             {icons.logo(32)}
@@ -580,7 +657,7 @@ function TeacherApp({ profile, onRefresh }) {
       </aside>
 
       {/* Main */}
-      <main style={{ flex: 1, padding: 32, overflowY: "auto" }}>
+      <main style={{ flex: 1, padding: mob ? "68px 12px 12px" : 32, overflowY: "auto" }}>
         {tab === "dashboard" && <TeacherDashboard profile={profile} students={students} worksheets={worksheets} submissions={submissions} courses={courses} />}
         {tab === "students" && <StudentsView students={students} submissions={submissions} worksheets={worksheets} />}
         {tab === "worksheets" && <WorksheetsView worksheets={worksheets} courses={courses} profile={profile} onRefresh={loadAll} />}
@@ -595,6 +672,8 @@ function TeacherApp({ profile, onRefresh }) {
 
 // ─── TEACHER DASHBOARD ────────────────────────────────────────────────────────
 function TeacherDashboard({ profile, students, worksheets, submissions, courses }) {
+  const w = useWindowWidth();
+  const mob = isMob(w);
   const pending = submissions.filter((s) => s.score === null).length;
   const shared = worksheets.filter((w) => w.shared).length;
   const scoredSubs = submissions.filter((s) => s.score !== null);
@@ -621,7 +700,7 @@ function TeacherDashboard({ profile, students, worksheets, submissions, courses 
         <p style={{ margin: "6px 0 0", color: C.muted }}>Here's what's happening in your classroom today.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr 1fr" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {stats.map((s) => (
           <div key={s.label} style={{ ...card, display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -633,7 +712,7 @@ function TeacherDashboard({ profile, students, worksheets, submissions, courses 
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 1fr", gap: 16 }}>
         <div style={card}>
           <h3 style={{ margin: "0 0 16px", color: C.navy, fontSize: 16 }}>Recent Submissions</h3>
           {submissions.slice(0, 5).map((s) => (
@@ -1212,16 +1291,19 @@ function StudentApp({ profile, onRefresh }) {
     ? (scoredSubs.reduce((a, b) => a + b.score, 0) / scoredSubs.length).toFixed(1)
     : null;
 
+  const w = useWindowWidth();
+  const mob = isMob(w);
+
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Lato',sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Lato',sans-serif", paddingBottom: mob ? 70 : 0 }}>
       <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
 
-      <header style={{ background: C.navy, padding: "0 24px", display: "flex", alignItems: "center", height: 60, gap: 16, position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {icons.logo(28)}
-          <span style={{ color: "#f59e0b", fontWeight: 900, fontFamily: "'Playfair Display',serif" }}>SDET</span>
+      <header style={{ background: C.navy, padding: "0 16px", display: "flex", alignItems: "center", height: 56, gap: 12, position: "sticky", top: 0, zIndex: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {icons.logo(24)}
+          <span style={{ color: "#f59e0b", fontWeight: 900, fontFamily: "'Playfair Display',serif", fontSize: mob ? 15 : 18 }}>SDET</span>
         </div>
-        <nav style={{ display: "flex", gap: 4, marginLeft: "auto" }}>
+        {!mob && <nav style={{ display: "flex", gap: 4, marginLeft: "auto" }}>
           {[
             { id: "home", label: "Home", icon: icons.home },
             { id: "worksheets", label: "Worksheets", icon: icons.worksheet },
@@ -1232,23 +1314,36 @@ function StudentApp({ profile, onRefresh }) {
               {n.icon(15)} {n.label}
             </button>
           ))}
-        </nav>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginLeft: 8 }}>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 700 }}>{profile.full_name}</div>
-            <div style={{ color: "#64748b", fontSize: 11 }}>Student</div>
-          </div>
+        </nav>}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}>
+          <div style={{ color: "#e2e8f0", fontSize: 12, fontWeight: 700 }}>{profile.full_name.split(" ")[0]}</div>
           <button onClick={logout} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}>{icons.logout(18)}</button>
         </div>
       </header>
 
-      <main style={{ maxWidth: 820, margin: "0 auto", padding: 28 }}>
+      {/* Mobile bottom tab bar */}
+      {mob && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: C.navy, borderTop: "1px solid #ffffff18", display: "flex", zIndex: 20, height: 60 }}>
+          {[
+            { id: "home", label: "Home", icon: icons.home },
+            { id: "worksheets", label: "Worksheets", icon: icons.worksheet },
+            { id: "submissions", label: "My Work", icon: icons.submit },
+          ].map((n) => (
+            <button key={n.id} onClick={() => setTab(n.id)}
+              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 10, fontWeight: tab === n.id ? 700 : 400, background: "transparent", color: tab === n.id ? "#f59e0b" : "#64748b" }}>
+              {n.icon(20)} {n.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <main style={{ maxWidth: 820, margin: "0 auto", padding: mob ? "16px 12px" : 28 }}>
         {tab === "home" && (
           <div>
             <h2 style={{ fontFamily: "'Playfair Display',serif", color: C.navy, margin: "0 0 24px", fontSize: 26 }}>
               Welcome, {profile.full_name.split(" ")[0]}!
             </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 28 }}>
+            <div style={{ display: "grid", gridTemplateColumns: mob ? "1fr" : "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
               {[
                 { label: "Courses Enrolled", value: enrollments.length, color: C.navy },
                 { label: "Pending Worksheets", value: pending.length, color: C.red },
