@@ -8,6 +8,19 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ─── Email Helper ─────────────────────────────────────────────────────────────
+async function sendEmail(to, subject, html) {
+  try {
+    await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to, subject, html }),
+    });
+  } catch (e) {
+    console.error("Email failed:", e);
+  }
+}
+
 // ─── Claude AI Helper (calls our secure server-side proxy) ────────────────────
 async function callClaude(prompt, system = "", max_tokens = 1000) {
   const res = await fetch("/api/claude", {
@@ -753,6 +766,40 @@ function WorksheetsView({ worksheets, courses, profile, onRefresh }) {
       questions: preview.questions,
       shared,
     });
+
+    // Send emails to all students when worksheet is shared
+    if (shared) {
+      const { data: students } = await supabase.from("profiles").select("email,full_name").eq("role", "student");
+      if (students?.length) {
+        const questionsHtml = preview.questions.map((q, i) => `<li style="margin-bottom:8px">${q}</li>`).join("");
+        for (const student of students) {
+          await sendEmail(
+            student.email,
+            `📚 New Worksheet: ${preview.topic} — SDET`,
+            `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
+              <div style="background:#1a2744;padding:20px;border-radius:12px 12px 0 0;text-align:center">
+                <h2 style="color:#d4a017;margin:0;font-size:20px">SDET Learning Platform</h2>
+                <p style="color:#94a3b8;margin:8px 0 0;font-size:13px">Sri Dayanidhi Educational Trust</p>
+              </div>
+              <div style="background:#fff;border:1px solid #e2e8f0;padding:28px;border-radius:0 0 12px 12px">
+                <p style="color:#64748b;margin:0 0 4px;font-size:13px">Hello ${student.full_name},</p>
+                <h3 style="color:#1a2744;margin:8px 0 16px;font-size:18px">New Worksheet Available!</h3>
+                <div style="background:#f0f9ff;border-left:4px solid #1a2744;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:20px">
+                  <strong style="color:#1a2744">${preview.subject}: ${preview.topic}</strong>
+                </div>
+                <p style="color:#374151;margin:0 0 12px;font-size:14px"><strong>Questions:</strong></p>
+                <ol style="color:#374151;font-size:14px;line-height:1.7;padding-left:20px">${questionsHtml}</ol>
+                <div style="margin-top:24px;text-align:center">
+                  <a href="https://sdet-platform.vercel.app" style="background:#1a2744;color:#d4a017;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Platform & Submit</a>
+                </div>
+                <p style="color:#94a3b8;font-size:12px;margin-top:20px;text-align:center">SDET — Guiding Students Towards Confidence, Knowledge & Success</p>
+              </div>
+            </div>`
+          );
+        }
+      }
+    }
+
     setPreview(null);
     setTopic("");
     onRefresh();
@@ -873,6 +920,38 @@ function SubmissionsView({ submissions, worksheets, onRefresh }) {
             { onConflict: "student_id,course_id,topic" }
           );
         }
+      }
+
+      // Send email to student with score and feedback
+      const studentEmail = sub.profiles?.email || sub.email;
+      const studentName = sub.profiles?.full_name || "Student";
+      if (studentEmail) {
+        const scoreColor = parsed.score >= 7 ? "#059669" : parsed.score >= 5 ? "#d97706" : "#dc2626";
+        await sendEmail(
+          studentEmail,
+          `📊 Your Score: ${parsed.score}/10 — ${ws?.topic} — SDET`,
+          `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
+            <div style="background:#1a2744;padding:20px;border-radius:12px 12px 0 0;text-align:center">
+              <h2 style="color:#d4a017;margin:0;font-size:20px">SDET Learning Platform</h2>
+              <p style="color:#94a3b8;margin:8px 0 0;font-size:13px">Sri Dayanidhi Educational Trust</p>
+            </div>
+            <div style="background:#fff;border:1px solid #e2e8f0;padding:28px;border-radius:0 0 12px 12px">
+              <p style="color:#64748b;margin:0 0 4px;font-size:13px">Hello ${studentName},</p>
+              <h3 style="color:#1a2744;margin:8px 0 16px;font-size:18px">Your worksheet has been evaluated!</h3>
+              <div style="background:#f8fafc;border-radius:12px;padding:20px;text-align:center;margin-bottom:20px">
+                <p style="color:#64748b;margin:0 0 4px;font-size:13px">Topic: <strong>${ws?.topic}</strong></p>
+                <div style="font-size:48px;font-weight:900;color:${scoreColor};margin:12px 0">${parsed.score}<span style="font-size:24px;color:#94a3b8">/10</span></div>
+              </div>
+              <div style="background:#f0fdf4;border-left:4px solid #059669;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:20px">
+                <p style="color:#065f46;margin:0;font-size:14px;line-height:1.7"><strong>Teacher Feedback:</strong><br/>${parsed.feedback}</p>
+              </div>
+              <div style="margin-top:24px;text-align:center">
+                <a href="https://sdet-platform.vercel.app" style="background:#1a2744;color:#d4a017;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">View on Platform</a>
+              </div>
+              <p style="color:#94a3b8;font-size:12px;margin-top:20px;text-align:center">SDET — Guiding Students Towards Confidence, Knowledge & Success</p>
+            </div>
+          </div>`
+        );
       }
 
       onRefresh();
