@@ -107,7 +107,6 @@ export default function App() {
   if (loading) return <Splash />;
   if (!session) return <LoginPage />;
 
-  // Show phone collection if student has no phone yet
   if (profile?.role === "student" && !profile?.phone) {
     return (
       <PhoneCollect
@@ -144,19 +143,150 @@ function LoginPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: `linear-gradient(135deg, ${C.navy} 0%, #0f1f40 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: "#fff", borderRadius: 24, padding: "48px 40px", maxWidth: 420, width: "100%", textAlign: "center", boxShadow: "0 24px 80px rgba(0,0,0,.3)" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>{icons.logo(52)}</div>
-        <div style={{ fontSize: 13, color: C.gold, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", marginBottom: 8 }}>Sri Dayanidhi Educational Trust</div>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: C.navy, margin: "0 0 8px", fontFamily: "Georgia,serif" }}>SDET Learning</h1>
-        <p style={{ color: C.muted, fontSize: 15, margin: "0 0 36px" }}>Physics & Mathematics Excellence Platform</p>
-        <button onClick={login} style={{ ...btn("outline"), width: "100%", justifyContent: "center", padding: "14px 22px", borderRadius: 12, borderColor: C.border, fontSize: 15 }}>
-          {icons.google(22)} Continue with Google
-        </button>
-        <p style={{ marginTop: 28, fontSize: 12, color: C.muted, lineHeight: 1.8 }}>
-          By signing in you agree to SDET's terms.<br />
-          New students will be asked for their phone number after sign-in.
-        </p>
+    <div style={{ minHeight: "100vh", background: C.navy, fontFamily: "'Lato',sans-serif", display: "flex", flexDirection: "column" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+
+      {/* Background building illustration */}
+      <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden" }}>
+        <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" style={{ width: "100%", height: "100%", opacity: 0.08 }}>
+          <rect x="180" y="120" width="1080" height="680" rx="4" fill="none" stroke="#fff" strokeWidth="2"/>
+          <rect x="180" y="120" width="1080" height="100" fill="#fff" opacity="0.3"/>
+          {[220,340,460,580,700,820,940,1060,1180].map((x,i) => (
+            <g key={i}>
+              <rect x={x} y="260" width="100" height="130" rx="2" fill="#fff" opacity="0.4"/>
+              <rect x={x} y="430" width="100" height="130" rx="2" fill="#fff" opacity="0.4"/>
+              <rect x={x} y="600" width="100" height="130" rx="2" fill="#fff" opacity="0.4"/>
+            </g>
+          ))}
+          <rect x="620" y="660" width="200" height="140" rx="0" fill="#fff" opacity="0.5"/>
+          <line x1="180" y1="220" x2="1260" y2="220" stroke="#fff" strokeWidth="1" opacity="0.5"/>
+          <line x1="180" y1="390" x2="1260" y2="390" stroke="#fff" strokeWidth="1" opacity="0.5"/>
+          <line x1="180" y1="560" x2="1260" y2="560" stroke="#fff" strokeWidth="1" opacity="0.5"/>
+          <line x1="180" y1="730" x2="1260" y2="730" stroke="#fff" strokeWidth="1" opacity="0.5"/>
+        </svg>
+        {/* Dark overlay gradient */}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(26,39,68,0.85) 0%, rgba(26,39,68,0.7) 60%, rgba(26,39,68,0.92) 100%)" }} />
+      </div>
+
+      {/* Navigation Bar */}
+      <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {icons.logo(36)}
+          <div>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: 16, fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi Educational Trust</div>
+            <div style={{ color: "#d4a017", fontSize: 11, fontWeight: 400, letterSpacing: 1 }}>Bengaluru, Karnataka</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 32 }}>
+          {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
+            <span key={item} style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer", fontWeight: 400, letterSpacing: 0.3 }}
+              onMouseEnter={e => e.target.style.color = "#d4a017"}
+              onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.7)"}>
+              {item}
+            </span>
+          ))}
+        </div>
+      </nav>
+
+      {/* Main Body */}
+      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", alignItems: "center", padding: "40px 48px", gap: 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
+
+        {/* Left — Hero */}
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 20, letterSpacing: 1 }}>
+            EST. — BENGALURU
+          </div>
+          <h1 style={{ margin: "0 0 6px", fontSize: 42, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.15 }}>
+            Sri Dayanidhi<br />Educational Trust
+          </h1>
+          <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>
+            SDET Learning Platform
+          </h2>
+          <p style={{ margin: "0 0 36px", color: "rgba(255,255,255,0.65)", fontSize: 15, lineHeight: 1.8, maxWidth: 420 }}>
+            Empowering students across ICSE, ISC, CBSE and Karnataka State Board with expert-led Physics, Mathematics, Chemistry and more.
+          </p>
+
+          {/* Stats */}
+          <div style={{ display: "flex", gap: 40 }}>
+            {[["500+", "Students"], ["15+", "Courses"], ["3", "Boards"]].map(([num, label]) => (
+              <div key={label}>
+                <div style={{ fontSize: 28, fontWeight: 900, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>{num}</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Board badges */}
+          <div style={{ display: "flex", gap: 10, marginTop: 28, flexWrap: "wrap" }}>
+            {["ICSE", "ISC", "CBSE", "Karnataka Board"].map((b) => (
+              <span key={b} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)", fontSize: 11, padding: "5px 14px", borderRadius: 20 }}>{b}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Right — Login Card */}
+        <div style={{ width: 380, flexShrink: 0 }}>
+          <div style={{ background: "#fff", borderRadius: 20, padding: "36px 32px", boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}>
+            {/* Card Header */}
+            <div style={{ textAlign: "center", marginBottom: 28 }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: C.navy, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                {icons.logo(30)}
+              </div>
+              <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>Welcome Back</div>
+              <h3 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800, color: C.navy, fontFamily: "'Playfair Display',serif" }}>Sign in to SDET</h3>
+              <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Access your learning dashboard</p>
+            </div>
+
+            <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 24 }} />
+
+            {/* Google Sign In */}
+            <button
+              onClick={login}
+              style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "14px 20px", background: "#fff", border: `1.5px solid ${C.border}`, borderRadius: 12, fontSize: 15, fontWeight: 700, color: C.navy, cursor: "pointer", fontFamily: "inherit", boxSizing: "border-box" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = C.navy; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.borderColor = C.border; }}
+            >
+              {icons.google(22)} Continue with Google
+            </button>
+
+            {/* Divider */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
+              <div style={{ flex: 1, height: 1, background: C.border }} />
+              <span style={{ fontSize: 12, color: C.muted }}>SDET Portal</span>
+              <div style={{ flex: 1, height: 1, background: C.border }} />
+            </div>
+
+            {/* Info boxes */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+              {[
+                { icon: "🎓", title: "Students", desc: "Access worksheets & track progress" },
+                { icon: "📋", title: "Teachers", desc: "Manage classes & AI evaluation" },
+              ].map((item) => (
+                <div key={item.title} style={{ background: "#f8f9ff", border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px" }}>
+                  <div style={{ fontSize: 18, marginBottom: 4 }}>{item.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{item.title}</div>
+                  <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.4, marginTop: 2 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            <p style={{ margin: 0, fontSize: 11, color: C.muted, textAlign: "center", lineHeight: 1.7 }}>
+              By signing in you agree to SDET's terms.<br />
+              New students will be asked for their phone number after sign-in.
+            </p>
+          </div>
+
+          {/* Below card */}
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>© 2026 Sri Dayanidhi Educational Trust</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer bar */}
+      <div style={{ position: "relative", zIndex: 2, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>sdet-platform.vercel.app</span>
+        <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>Physics · Mathematics · Chemistry · Biology · English</span>
       </div>
     </div>
   );
@@ -170,10 +300,8 @@ function PhoneCollect({ uid, onDone }) {
   const save = async () => {
     if (phone.length < 10) return;
     setSaving(true);
-    // Save phone number
     await supabase.from("profiles").update({ phone }).eq("id", uid);
 
-    // FIX: Auto-enroll student in ALL existing courses
     const { data: courses } = await supabase.from("courses").select("id");
     if (courses?.length) {
       const enrollments = courses.map((c) => ({ student_id: uid, course_id: c.id }));
@@ -316,7 +444,6 @@ function TeacherDashboard({ profile, students, worksheets, submissions, courses 
     { label: "Avg Class Score", value: avgScore, color: C.green, icon: icons.star },
   ];
 
-  // Greeting based on time of day
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
@@ -450,7 +577,6 @@ function WorksheetsView({ worksheets, courses, profile, onRefresh }) {
     setGenerating(true);
     setError("");
     try {
-      // FIX: use backtick template literal so ${subject} interpolates correctly
       const resp = await callClaude(
         `Create a student worksheet for ${subject}, topic: "${topic}". Generate 5 questions mixing conceptual and problem-solving. Return JSON only: {"questions":["q1","q2","q3","q4","q5"]}`,
         `You are an expert ${subject} teacher. Return only valid JSON, no markdown, no explanation.`
@@ -496,7 +622,6 @@ function WorksheetsView({ worksheets, courses, profile, onRefresh }) {
         </div>
       )}
 
-      {/* AI Generator */}
       <div style={{ ...card, marginBottom: 28, background: "linear-gradient(135deg,#1a2744 0%,#0f3460 100%)", border: "none" }}>
         <h3 style={{ margin: "0 0 16px", color: "#f59e0b", fontSize: 16, display: "flex", alignItems: "center", gap: 8 }}>
           {icons.brain(18)} AI Worksheet Generator
@@ -544,7 +669,6 @@ function WorksheetsView({ worksheets, courses, profile, onRefresh }) {
         )}
       </div>
 
-      {/* Worksheet list */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {worksheets.map((w) => (
           <div key={w.id} style={{ ...card, display: "flex", alignItems: "center", gap: 16, padding: "18px 24px" }}>
@@ -589,7 +713,6 @@ function SubmissionsView({ submissions, worksheets, onRefresh }) {
         evaluated_at: new Date().toISOString(),
       }).eq("id", sub.id);
 
-      // Upsert weak points tracker
       if (parsed.weak_points?.length && ws?.course_id) {
         for (const wp of parsed.weak_points) {
           if (!wp) continue;
@@ -862,7 +985,6 @@ function StudentApp({ profile, onRefresh }) {
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Lato',sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
 
-      {/* Top nav */}
       <header style={{ background: C.navy, padding: "0 24px", display: "flex", alignItems: "center", height: 60, gap: 16, position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {icons.logo(28)}
@@ -1059,7 +1181,6 @@ function TeacherProfile({ profile, onRefresh }) {
     const file = e.target.files[0];
     if (!file) return;
     setUploading(true);
-    // Convert to base64 data URL for preview and storage
     const reader = new FileReader();
     reader.onload = async (ev) => {
       const dataUrl = ev.target.result;
@@ -1111,7 +1232,6 @@ function TeacherProfile({ profile, onRefresh }) {
       <h2 style={{ margin: "0 0 8px", fontFamily: "'Playfair Display',serif", color: C.navy, fontSize: 26 }}>My Profile</h2>
       <p style={{ margin: "0 0 28px", color: C.muted, fontSize: 14 }}>Update your profile details. Students and admins can see this information.</p>
 
-      {/* Photo Section */}
       <div style={{ ...card, marginBottom: 20, display: "flex", alignItems: "center", gap: 24 }}>
         <div style={{ position: "relative", flexShrink: 0 }}>
           {previewUrl ? (
@@ -1137,7 +1257,6 @@ function TeacherProfile({ profile, onRefresh }) {
         </div>
       </div>
 
-      {/* Form Fields */}
       <div style={{ ...card, display: "flex", flexDirection: "column", gap: 20 }}>
         {fields.map((f) => (
           <div key={f.key}>
@@ -1172,7 +1291,6 @@ function TeacherProfile({ profile, onRefresh }) {
         </div>
       </div>
 
-      {/* Profile Preview */}
       <div style={{ ...card, marginTop: 20, background: "linear-gradient(135deg,#1a2744 0%,#0f3460 100%)", border: "none" }}>
         <div style={{ color: "#f59e0b", fontWeight: 700, fontSize: 14, marginBottom: 16 }}>👁 How students see your profile</div>
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
