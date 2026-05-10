@@ -137,14 +137,165 @@ function Splash() {
 
 // ─── LOGIN PAGE ───────────────────────────────────────────────────────────────
 function LoginPage() {
+  const [modal, setModal] = useState(null);
+
   const login = () => supabase.auth.signInWithOAuth({
     provider: "google",
     options: { redirectTo: window.location.origin },
   });
 
+  const modalContent = {
+    "About Us": {
+      title: "About Us",
+      icon: "🏫",
+      content: (
+        <div>
+          <h3 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 4px", fontSize: 20 }}>Welcome to SDET</h3>
+          <p style={{ color: "#d4a017", fontWeight: 700, margin: "0 0 16px", fontSize: 14 }}>Sri Dayanidhi Educational Trust</p>
+          <p style={{ color: C.text, fontSize: 14, lineHeight: 1.8, margin: "0 0 14px" }}>Sri Dayanidhi Educational Trust was established with a vision to guide students towards a brighter and more successful future. Founded by <strong>Arun Kumar M N</strong>, the institution is committed to helping students overcome fear, confusion, and challenges related to education and career growth.</p>
+          <p style={{ color: C.text, fontSize: 14, lineHeight: 1.8, margin: "0 0 20px" }}>At SDET, we believe that every student has unique talents and abilities. Our mission is to identify students' strengths, build confidence, and support them in achieving their academic and career goals.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
+            <div style={{ background: "#f0f9ff", borderRadius: 12, padding: 16 }}>
+              <div style={{ fontWeight: 700, color: C.navy, marginBottom: 8, fontSize: 13 }}>🎯 Our Mission</div>
+              {["Empower students with confidence and knowledge", "Help students discover their abilities", "Provide quality education with personal guidance", "Create a positive learning environment"].map((m, i) => (
+                <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, paddingLeft: 10, borderLeft: `2px solid #d4a017`, marginBottom: 6 }}>{m}</div>
+              ))}
+            </div>
+            <div style={{ background: "#f0fdf4", borderRadius: 12, padding: 16 }}>
+              <div style={{ fontWeight: 700, color: C.navy, marginBottom: 8, fontSize: 13 }}>✅ Why Choose SDET?</div>
+              {["Experienced & student-friendly faculty", "Individual attention and mentoring", "Focus on academic excellence", "Supportive growth environment", "Improves confidence & performance"].map((m, i) => (
+                <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, paddingLeft: 10, borderLeft: `2px solid #059669`, marginBottom: 6 }}>{m}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    "Courses": {
+      title: "Courses Offered",
+      icon: "📚",
+      content: (
+        <div>
+          <p style={{ color: C.muted, fontSize: 14, margin: "0 0 20px" }}>We provide coaching and academic support across all major boards and subjects.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+            <div style={{ background: "#f0f9ff", borderRadius: 12, padding: 16 }}>
+              <div style={{ fontWeight: 700, color: C.navy, marginBottom: 10, fontSize: 13 }}>🏫 Boards Covered</div>
+              {["ICSE", "CBSE", "State Board"].map((b, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: C.text, marginBottom: 8 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#d4a017", flexShrink: 0, display: "inline-block" }} />{b}
+                </div>
+              ))}
+            </div>
+            <div style={{ background: "#fffbeb", borderRadius: 12, padding: 16 }}>
+              <div style={{ fontWeight: 700, color: C.navy, marginBottom: 10, fontSize: 13 }}>🎓 Classes</div>
+              <div style={{ fontSize: 13, color: C.text, lineHeight: 1.8 }}>Class 1 to Class 12<br />(All Standards)</div>
+            </div>
+            <div style={{ background: "#f0fdf4", borderRadius: 12, padding: 16 }}>
+              <div style={{ fontWeight: 700, color: C.navy, marginBottom: 10, fontSize: 13 }}>📖 Subjects</div>
+              {["Mathematics", "Science", "Physics", "Chemistry", "Biology", "Social Science", "English", "Kannada", "Hindi", "Commerce", "Computer Science"].map((s, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: C.text, marginBottom: 6 }}>
+                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#059669", flexShrink: 0, display: "inline-block" }} />{s}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    "Teachers": {
+      title: "Our Teachers",
+      icon: "👨‍🏫",
+      content: (
+        <div>
+          <p style={{ color: C.text, fontSize: 14, lineHeight: 1.8, margin: "0 0 20px" }}>Our faculty consists of experienced and dedicated teachers who are passionate about student success. They provide personalized attention and simplified teaching methods to help every student learn with confidence.</p>
+          <div style={{ background: "#f8f9ff", borderRadius: 12, padding: 20, marginBottom: 16 }}>
+            <div style={{ fontWeight: 700, color: C.navy, marginBottom: 14, fontSize: 14 }}>Faculty Members</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                { subject: "Mathematics", color: "#dbeafe", text: "#1d4ed8" },
+                { subject: "Science", color: "#d1fae5", text: "#065f46" },
+                { subject: "English", color: "#fce7f3", text: "#9d174d" },
+                { subject: "Physics", color: "#ede9fe", text: "#5b21b6" },
+                { subject: "Commerce", color: "#fef3c7", text: "#92400e" },
+              ].map((t, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#fff", borderRadius: 8, border: `1px solid ${C.border}` }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: t.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: t.text, flexShrink: 0 }}>
+                    {t.subject[0]}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>Mr./Mrs. __________</div>
+                    <div style={{ fontSize: 12, color: C.muted }}>{t.subject} Teacher</div>
+                  </div>
+                  <span style={{ marginLeft: "auto", background: t.color, color: t.text, fontSize: 11, padding: "3px 10px", borderRadius: 20, fontWeight: 700 }}>{t.subject}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: 12, color: C.muted, marginTop: 14, fontStyle: "italic" }}>* Teacher names will be updated soon.</p>
+          </div>
+        </div>
+      ),
+    },
+    "Contact": {
+      title: "Contact Us",
+      icon: "📞",
+      content: (
+        <div>
+          <div style={{ background: "linear-gradient(135deg, #1a2744, #0f3460)", borderRadius: 16, padding: 24, marginBottom: 20, textAlign: "center" }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>🏛️</div>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: 18, fontFamily: "'Playfair Display',serif", marginBottom: 4 }}>Sri Dayanidhi Educational Trust</div>
+            <div style={{ color: "#d4a017", fontSize: 13, fontStyle: "italic", marginTop: 8 }}>"Guiding Students Towards Confidence, Knowledge & Success."</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {[
+              { icon: "📍", label: "Address", value: "Mulbagal, Kolar District, Karnataka" },
+              { icon: "📞", label: "Contact Number", value: "9620647878" },
+              { icon: "📚", label: "Coaching For", value: "ICSE | CBSE | State Board" },
+              { icon: "🎓", label: "Classes", value: "1st to 12th Standard" },
+            ].map((item, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "14px 18px", background: "#f8fafc", borderRadius: 10, border: `1px solid ${C.border}` }}>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>{item.icon}</span>
+                <div>
+                  <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>{item.label}</div>
+                  <div style={{ fontSize: 14, color: C.text, fontWeight: 700 }}>{item.value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ),
+    },
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: C.navy, fontFamily: "'Lato',sans-serif", display: "flex", flexDirection: "column" }}>
       <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+
+      {/* Modal Overlay */}
+      {modal && (
+        <div
+          onClick={() => setModal(null)}
+          style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 680, maxHeight: "85vh", overflowY: "auto", boxShadow: "0 32px 80px rgba(0,0,0,0.4)" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 28px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, background: "#fff", zIndex: 1, borderRadius: "20px 20px 0 0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontSize: 24 }}>{modalContent[modal].icon}</span>
+                <h2 style={{ margin: 0, fontSize: 20, fontFamily: "'Playfair Display',serif", color: C.navy }}>{modalContent[modal].title}</h2>
+              </div>
+              <button
+                onClick={() => setModal(null)}
+                style={{ background: "#f1f5f9", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", fontSize: 18, color: C.muted, display: "flex", alignItems: "center", justifyContent: "center" }}
+              >×</button>
+            </div>
+            <div style={{ padding: "24px 28px" }}>
+              {modalContent[modal].content}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Background building illustration */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden" }}>
@@ -164,7 +315,6 @@ function LoginPage() {
           <line x1="180" y1="560" x2="1260" y2="560" stroke="#fff" strokeWidth="1" opacity="0.5"/>
           <line x1="180" y1="730" x2="1260" y2="730" stroke="#fff" strokeWidth="1" opacity="0.5"/>
         </svg>
-        {/* Dark overlay gradient */}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(26,39,68,0.85) 0%, rgba(26,39,68,0.7) 60%, rgba(26,39,68,0.92) 100%)" }} />
       </div>
 
@@ -179,7 +329,9 @@ function LoginPage() {
         </div>
         <div style={{ display: "flex", gap: 32 }}>
           {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
-            <span key={item} style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer", fontWeight: 400, letterSpacing: 0.3 }}
+            <span key={item}
+              onClick={() => setModal(item)}
+              style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer", fontWeight: 400, letterSpacing: 0.3 }}
               onMouseEnter={e => e.target.style.color = "#d4a017"}
               onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.7)"}>
               {item}
