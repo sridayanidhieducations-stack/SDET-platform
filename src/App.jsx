@@ -358,34 +358,32 @@ function LoginPage() {
 function LoginNav({ setModal, mob }) {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <nav style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: mob ? "12px 16px" : "16px 48px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        {icons.logo(mob ? 28 : 36)}
-        <div>
-          <div style={{ color: "#fff", fontWeight: 700, fontSize: mob ? 13 : 16, fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi Educational Trust</div>
-          {!mob && <div style={{ color: "#d4a017", fontSize: 11, fontWeight: 400, letterSpacing: 1 }}>Bengaluru, Karnataka</div>}
+    <>
+      <style>{`
+        @media (max-width: 767px) {
+          .sdet-nav-links { display: none !important; }
+          .sdet-hamburger { display: flex !important; }
+          .sdet-nav { padding: 12px 16px !important; }
+          .sdet-nav-subtitle { display: none !important; }
+          .sdet-login-desktop { display: none !important; }
+          .sdet-login-mobile { display: flex !important; }
+        }
+        @media (min-width: 768px) {
+          .sdet-hamburger { display: none !important; }
+          .sdet-login-mobile { display: none !important; }
+          .sdet-login-desktop { display: flex !important; }
+        }
+        .sdet-login-mobile { display: none; flex-direction: column; }
+      `}</style>
+      <nav className="sdet-nav" style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 48px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {icons.logo(32)}
+          <div>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: 15, fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi Educational Trust</div>
+            <div className="sdet-nav-subtitle" style={{ color: "#d4a017", fontSize: 11, fontWeight: 400, letterSpacing: 1 }}>Bengaluru, Karnataka</div>
+          </div>
         </div>
-      </div>
-      {mob ? (
-        <div style={{ position: "relative" }}>
-          <button onClick={() => setMenuOpen(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8 }}>
-            <div style={{ width: 22, height: 2, background: "#fff", marginBottom: 5, borderRadius: 2 }} />
-            <div style={{ width: 22, height: 2, background: "#fff", marginBottom: 5, borderRadius: 2 }} />
-            <div style={{ width: 22, height: 2, background: "#fff", borderRadius: 2 }} />
-          </button>
-          {menuOpen && (
-            <div style={{ position: "absolute", right: 0, top: 44, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 160, zIndex: 10 }}>
-              {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
-                <div key={item} onClick={() => { setModal(item); setMenuOpen(false); }}
-                  style={{ padding: "12px 20px", color: "rgba(255,255,255,0.8)", fontSize: 14, cursor: "pointer" }}>
-                  {item}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div style={{ display: "flex", gap: 32 }}>
+        <div className="sdet-nav-links" style={{ display: "flex", gap: 32 }}>
           {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
             <span key={item} onClick={() => setModal(item)}
               style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer", fontWeight: 400, letterSpacing: 0.3 }}
@@ -395,15 +393,32 @@ function LoginNav({ setModal, mob }) {
             </span>
           ))}
         </div>
-      )}
-    </nav>
+        <div className="sdet-hamburger" style={{ display: "none", position: "relative", flexDirection: "column" }}>
+          <button onClick={() => setMenuOpen(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", flexDirection: "column", gap: 5 }}>
+            <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
+            <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
+            <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
+          </button>
+          {menuOpen && (
+            <div style={{ position: "absolute", right: 0, top: 48, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 180, zIndex: 100, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
+              {["About Us", "Courses", "Teachers", "Contact"].map((item) => (
+                <div key={item} onClick={() => { setModal(item); setMenuOpen(false); }}
+                  style={{ padding: "14px 20px", color: "rgba(255,255,255,0.85)", fontSize: 15, cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </nav>
+    </>
   );
 }
 
 function LoginBody({ login, mob }) {
   return (
-      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", alignItems: "stretch", padding: mob ? "20px 16px 24px" : "40px 48px", gap: mob ? 20 : 48, maxWidth: mob ? "100%" : 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
-      {!mob && <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 48, flex: 1 }}>
+      <div style={{ position: "relative", zIndex: 2, flex: 1, width: "100%", boxSizing: "border-box" }}>
+      <div className="sdet-login-desktop" style={{ flexDirection: "row", alignItems: "center", gap: 48, flex: 1, padding: "40px 48px", maxWidth: 1200, margin: "0 auto" }}>
 
         {/* Left — Hero */}
         <div style={{ flex: 1 }}>
@@ -439,7 +454,7 @@ function LoginBody({ login, mob }) {
         </div>
 
         {/* Right — Login Card — Desktop */}
-        <div style={{ width: 380, flexShrink: 0 }}>
+        <div style={{ width: 380, flexShrink: 0, display: "flex", flexDirection: "column" }}>
           <div style={{ background: "#fff", borderRadius: 20, padding: "36px 32px", boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}>
             {/* Card Header */}
             <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -498,7 +513,7 @@ function LoginBody({ login, mob }) {
       </div>}
 
       {/* Mobile: hero then card stacked */}
-      {mob && <>
+      <div className="sdet-login-mobile" style={{ flexDirection: "column", padding: "20px 16px 32px", gap: 20 }}>
         <div>
           <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 12, letterSpacing: 1 }}>EST. — BENGALURU</div>
           <h1 style={{ margin: "0 0 6px", fontSize: 30, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi<br/>Educational Trust</h1>
@@ -537,7 +552,8 @@ function LoginBody({ login, mob }) {
           </div>
           <p style={{ margin: 0, fontSize: 11, color: C.muted, textAlign: "center", lineHeight: 1.7 }}>By signing in you agree to SDET's terms.</p>
         </div>
-      </>}
+      </div>
+      </div>
       </div>
 
       {/* Footer bar */}
