@@ -151,6 +151,10 @@ export default function App() {
     );
   }
 
+  if (profile?.role === "teacher" && !profile?.subject) {
+    return <TeacherOnboarding uid={session.user.id} onDone={() => fetchProfile(session.user.id)} />;
+  }
+
   if (profile?.role === "teacher" && !profile?.approved) {
     return (
       <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #1a2744 0%, #0f1f40 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -158,8 +162,8 @@ export default function App() {
           <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
           <h2 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 12px" }}>Awaiting Approval</h2>
           <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.7, margin: "0 0 24px" }}>
-            Your teacher account is pending approval by the admin.<br/>
-            Please contact <strong>Arun Kumar MN</strong> at <strong>9620647878</strong> to get approved.
+            Your profile has been submitted! The admin will review and approve your account shortly.<br/><br/>
+            Please contact <strong>Arun Kumar MN</strong> at <strong>9620647878</strong> if urgent.
           </p>
           <button onClick={() => supabase.auth.signOut()} style={{ ...btn("outline"), justifyContent: "center", width: "100%" }}>
             Sign Out
@@ -532,16 +536,100 @@ function LoginPage() {
   );
 }
 
+// ─── TEACHER ONBOARDING ──────────────────────────────────────────────────────
+function TeacherOnboarding({ uid, onDone }) {
+  const [form, setForm] = useState({ full_name: "", phone: "", subject: "", bio: "", education: "", experience: "" });
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const allSubjects = ["Mathematics", "Physics", "Chemistry", "Biology", "Science", "English", "Kannada", "Hindi", "Social Science", "Commerce", "Computer Science"];
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const toggleSubject = (s) => setSelectedSubjects(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
+
+  const save = async () => {
+    if (!form.full_name || !form.phone || selectedSubjects.length === 0) return;
+    setSaving(true);
+    await supabase.from("profiles").update({
+      full_name: form.full_name,
+      phone: form.phone,
+      subject: selectedSubjects.join(", "),
+      bio: form.bio,
+      education: form.education,
+      experience: form.experience,
+      approved: false,
+    }).eq("id", uid);
+    setSaving(false);
+    onDone();
+  };
+
+  const valid = form.full_name.trim() && form.phone.length >= 10 && selectedSubjects.length > 0;
+
+  return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #1a2744 0%, #0f1f40 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ ...card, maxWidth: 500, width: "100%" }}>
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>{icons.logo(44)}</div>
+          <h2 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 4px", fontSize: 22 }}>Teacher Profile Setup</h2>
+          <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>Fill in your details to get started</p>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Full Name *</label>
+            <input value={form.full_name} onChange={e => set("full_name", e.target.value)} placeholder="Your full name" style={inp} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Phone Number *</label>
+            <input value={form.phone} onChange={e => set("phone", e.target.value.replace(/\D/g, ""))} placeholder="e.g. 9876543210" maxLength={10} style={inp} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 8 }}>Subjects You Teach *</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {allSubjects.map(s => (
+                <button key={s} onClick={() => toggleSubject(s)}
+                  style={{ padding: "8px 14px", borderRadius: 20, border: `1.5px solid ${selectedSubjects.includes(s) ? C.navy : C.border}`, background: selectedSubjects.includes(s) ? C.navy : "#fff", color: selectedSubjects.includes(s) ? "#fff" : C.text, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                  {selectedSubjects.includes(s) ? "✓ " : ""}{s}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Education Qualifications</label>
+            <input value={form.education} onChange={e => set("education", e.target.value)} placeholder="e.g. M.Sc Physics, B.Ed" style={inp} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Years of Experience</label>
+            <input value={form.experience} onChange={e => set("experience", e.target.value)} placeholder="e.g. 8 years" style={inp} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Short Bio (Optional)</label>
+            <textarea value={form.bio} onChange={e => set("bio", e.target.value)} placeholder="Tell students about yourself..." rows={3} style={{ ...inp, resize: "vertical" }} />
+          </div>
+          <button onClick={save} disabled={!valid || saving}
+            style={{ ...btn("primary"), justifyContent: "center", opacity: valid ? 1 : 0.5, marginTop: 8 }}>
+            {saving ? "Submitting…" : "Submit Profile for Approval"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── STUDENT ONBOARDING ───────────────────────────────────────────────────────
 function PhoneCollect({ uid, onDone }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     full_name: "", phone: "", parent_name: "",
     class_level: "", school_name: "", board: "",
-    subjects: [],
+    subjects: [], teacher_id: "",
   });
   const [saving, setSaving] = useState(false);
+  const [teachers, setTeachers] = useState([]);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  useEffect(() => {
+    supabase.from("profiles").select("id,full_name,subject").eq("role", "teacher").eq("approved", true)
+      .then(({ data }) => setTeachers(data || []));
+  }, []);
 
   const toggleSubject = (s) => {
     setForm(f => ({
@@ -560,6 +648,7 @@ function PhoneCollect({ uid, onDone }) {
       school_name: form.school_name,
       board: form.board,
       subjects: form.subjects,
+      teacher_id: form.teacher_id || null,
     }).eq("id", uid);
 
     const { data: courses } = await supabase.from("courses").select("id");
@@ -646,6 +735,13 @@ function PhoneCollect({ uid, onDone }) {
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>School Name *</label>
               <input value={form.school_name} onChange={e => set("school_name", e.target.value)} placeholder="Enter your school name" style={inp} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Select Your Teacher (Optional)</label>
+              <select value={form.teacher_id || ""} onChange={e => set("teacher_id", e.target.value)} style={{ ...inp }}>
+                <option value="">I'll be assigned by admin</option>
+                {teachers.map(t => <option key={t.id} value={t.id}>{t.full_name} — {t.subject || "General"}</option>)}
+              </select>
             </div>
             <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
               <button onClick={() => setStep(1)} style={{ ...btn("outline"), flex: 1, justifyContent: "center" }}>← Back</button>
@@ -1338,13 +1434,31 @@ function ProgressView({ students, submissions }) {
 // ─── TEACHERS VIEW (Admin only) ───────────────────────────────────────────────
 function TeachersView({ profile }) {
   const [teachers, setTeachers] = useState([]);
+  const [students, setStudents] = useState([]);
   useEffect(() => {
     supabase.from("profiles").select("*").in("role", ["teacher", "admin"]).then(({ data }) => setTeachers(data || []));
+    supabase.from("profiles").select("*").eq("role", "student").then(({ data }) => setStudents(data || []));
   }, []);
 
-  const promote = async (uid) => {
-    await supabase.from("profiles").update({ role: "teacher", approved: true }).eq("id", uid);
-    setTeachers((t) => t.map((x) => x.id === uid ? { ...x, role: "teacher", approved: true } : x));
+  const promote = async (teacher) => {
+    await supabase.from("profiles").update({ role: "teacher", approved: true }).eq("id", teacher.id);
+    
+    // Auto-create courses for this teacher based on their subjects
+    const subjects = (teacher.subject || "").split(",").map(s => s.trim()).filter(Boolean);
+    if (subjects.length > 0) {
+      const courseInserts = subjects.map(sub => ({
+        title: `${sub}`,
+        subject: sub,
+        description: `${sub} coaching by ${teacher.full_name}`,
+        teacher_id: teacher.id,
+      }));
+      await supabase.from("courses").upsert(courseInserts, { onConflict: "title,teacher_id", ignoreDuplicates: true });
+    }
+    setTeachers((t) => t.map((x) => x.id === teacher.id ? { ...x, approved: true } : x));
+  };
+
+  const assignStudentToTeacher = async (studentId, teacherId) => {
+    await supabase.from("profiles").update({ teacher_id: teacherId }).eq("id", studentId);
   };
 
   return (
@@ -1372,13 +1486,48 @@ function TeachersView({ profile }) {
                 <td style={{ padding: "14px 20px" }}>
                   {t.approved
                     ? <span style={{ color: C.green, fontSize: 13 }}>✓ Active</span>
-                    : <button onClick={() => promote(t.id)} style={{ ...btn("primary"), padding: "6px 14px", fontSize: 12 }}>Approve</button>}
+                    : <button onClick={() => promote(t)} style={{ ...btn("primary"), padding: "6px 14px", fontSize: 12 }}>Approve & Create Courses</button>}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
         {teachers.length === 0 && <p style={{ padding: 24, color: C.muted, textAlign: "center" }}>No teachers yet.</p>}
+      </div>
+
+      {/* Student-Teacher Assignment */}
+      <div style={{ ...card, marginTop: 28 }}>
+        <h3 style={{ margin: "0 0 16px", color: C.navy, fontSize: 16 }}>👨‍🎓 Assign Students to Teachers</h3>
+        <p style={{ color: C.muted, fontSize: 13, margin: "0 0 16px" }}>Assign each student to a specific teacher so they only see that teacher's worksheets.</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {students.map(s => {
+            const assignedTeacher = teachers.find(t => t.id === s.teacher_id);
+            return (
+              <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#f8fafc", borderRadius: 10, border: `1px solid ${C.border}` }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#1d4ed8", flexShrink: 0 }}>
+                  {s.full_name?.[0]}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: C.text }}>{s.full_name}</div>
+                  <div style={{ fontSize: 11, color: C.muted }}>{s.class_level || "—"} · {s.board || "—"} · {s.school_name || "—"}</div>
+                </div>
+                <select
+                  value={s.teacher_id || ""}
+                  onChange={async e => {
+                    await assignStudentToTeacher(s.id, e.target.value || null);
+                    setStudents(prev => prev.map(x => x.id === s.id ? { ...x, teacher_id: e.target.value || null } : x));
+                  }}
+                  style={{ ...inp, width: 200, fontSize: 12, padding: "8px 10px" }}>
+                  <option value="">Unassigned</option>
+                  {teachers.filter(t => t.role !== "admin").map(t => (
+                    <option key={t.id} value={t.id}>{t.full_name} — {t.subject || "General"}</option>
+                  ))}
+                </select>
+              </div>
+            );
+          })}
+          {students.length === 0 && <p style={{ color: C.muted, fontSize: 14 }}>No students yet.</p>}
+        </div>
       </div>
     </div>
   );
