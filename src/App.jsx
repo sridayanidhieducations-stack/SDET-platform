@@ -126,6 +126,15 @@ export default function App() {
 
   const fetchProfile = async (uid) => {
     const { data } = await supabase.from("profiles").select("*").eq("id", uid).single();
+    if (data && data.role === "student") {
+      const intendedRole = localStorage.getItem("sdet_intended_role");
+      if (intendedRole === "teacher") {
+        await supabase.from("profiles").update({ role: "teacher", approved: false }).eq("id", uid);
+        data.role = "teacher";
+        data.approved = false;
+      }
+      localStorage.removeItem("sdet_intended_role");
+    }
     setProfile(data);
     setLoading(false);
   };
@@ -139,6 +148,24 @@ export default function App() {
         uid={session.user.id}
         onDone={() => fetchProfile(session.user.id)}
       />
+    );
+  }
+
+  if (profile?.role === "teacher" && !profile?.approved) {
+    return (
+      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #1a2744 0%, #0f1f40 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ ...card, maxWidth: 420, width: "100%", textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
+          <h2 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 12px" }}>Awaiting Approval</h2>
+          <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.7, margin: "0 0 24px" }}>
+            Your teacher account is pending approval by the admin.<br/>
+            Please contact <strong>Arun Kumar MN</strong> at <strong>9620647878</strong> to get approved.
+          </p>
+          <button onClick={() => supabase.auth.signOut()} style={{ ...btn("outline"), justifyContent: "center", width: "100%" }}>
+            Sign Out
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -291,36 +318,56 @@ function LoginPage() {
     },
   };
 
+  const loginAs = (role) => supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin,
+      queryParams: { prompt: "select_account" },
+    },
+  }).then(() => {
+    // Store intended role in localStorage for after redirect
+    localStorage.setItem("sdet_intended_role", role);
+  });
+
   const LoginCard = () => (
     <div style={{ background: "#fff", borderRadius: 20, padding: "32px 28px", boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: C.navy, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>{icons.logo(28)}</div>
-        <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Welcome Back</div>
-        <h3 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800, color: C.navy, fontFamily: "'Playfair Display',serif" }}>Sign in to SDET</h3>
-        <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Access your learning dashboard</p>
+        <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Welcome to SDET</div>
+        <h3 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800, color: C.navy, fontFamily: "'Playfair Display',serif" }}>Sign in to your account</h3>
+        <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Choose how you want to sign in</p>
       </div>
       <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 20 }} />
-      <button onClick={login}
-        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "14px 20px", background: "#fff", border: `1.5px solid ${C.border}`, borderRadius: 12, fontSize: 15, fontWeight: 700, color: C.navy, cursor: "pointer", fontFamily: "inherit", boxSizing: "border-box" }}>
-        {icons.google(22)} Continue with Google
+
+      {/* Student Login */}
+      <button onClick={() => loginAs("student")}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", background: "#f0f9ff", border: "1.5px solid #bae6fd", borderRadius: 14, fontSize: 14, fontWeight: 700, color: C.navy, cursor: "pointer", fontFamily: "inherit", boxSizing: "border-box", marginBottom: 12 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 10, background: "#1d4ed8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <span style={{ fontSize: 20 }}>🎓</span>
+        </div>
+        <div style={{ flex: 1, textAlign: "left" }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: C.navy }}>Login as Student</div>
+          <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Access worksheets & track your progress</div>
+        </div>
+        <div style={{ flexShrink: 0 }}>{icons.google(18)}</div>
       </button>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "16px 0" }}>
-        <div style={{ flex: 1, height: 1, background: C.border }} />
-        <span style={{ fontSize: 12, color: C.muted }}>SDET Portal</span>
-        <div style={{ flex: 1, height: 1, background: C.border }} />
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-        {[{ icon: "🎓", title: "Students", desc: "Worksheets & progress" }, { icon: "📋", title: "Teachers", desc: "Classes & AI evaluation" }].map(item => (
-          <div key={item.title} style={{ background: "#f8f9ff", border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px" }}>
-            <div style={{ fontSize: 18, marginBottom: 4 }}>{item.icon}</div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{item.title}</div>
-            <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.4, marginTop: 2 }}>{item.desc}</div>
-          </div>
-        ))}
-      </div>
+
+      {/* Teacher Login */}
+      <button onClick={() => loginAs("teacher")}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", background: "#fffbeb", border: "1.5px solid #fcd34d", borderRadius: 14, fontSize: 14, fontWeight: 700, color: C.navy, cursor: "pointer", fontFamily: "inherit", boxSizing: "border-box", marginBottom: 20 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 10, background: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <span style={{ fontSize: 20 }}>📋</span>
+        </div>
+        <div style={{ flex: 1, textAlign: "left" }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: C.navy }}>Login as Teacher</div>
+          <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Manage classes & AI evaluation</div>
+        </div>
+        <div style={{ flexShrink: 0 }}>{icons.google(18)}</div>
+      </button>
+
       <p style={{ margin: 0, fontSize: 11, color: C.muted, textAlign: "center", lineHeight: 1.7 }}>
         By signing in you agree to SDET's terms.<br />
-        New students will be asked for their phone number after sign-in.
+        New users will complete their profile after sign-in.
       </p>
     </div>
   );
@@ -485,52 +532,158 @@ function LoginPage() {
   );
 }
 
-// ─── PHONE COLLECT ────────────────────────────────────────────────────────────
+// ─── STUDENT ONBOARDING ───────────────────────────────────────────────────────
 function PhoneCollect({ uid, onDone }) {
-  const [phone, setPhone] = useState("");
+  const [step, setStep] = useState(1);
+  const [form, setForm] = useState({
+    full_name: "", phone: "", parent_name: "",
+    class_level: "", school_name: "", board: "",
+    subjects: [],
+  });
   const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const toggleSubject = (s) => {
+    setForm(f => ({
+      ...f,
+      subjects: f.subjects.includes(s) ? f.subjects.filter(x => x !== s) : [...f.subjects, s]
+    }));
+  };
 
   const save = async () => {
-    if (phone.length < 10) return;
     setSaving(true);
-    await supabase.from("profiles").update({ phone }).eq("id", uid);
+    await supabase.from("profiles").update({
+      full_name: form.full_name,
+      phone: form.phone,
+      parent_name: form.parent_name,
+      class_level: form.class_level,
+      school_name: form.school_name,
+      board: form.board,
+      subjects: form.subjects,
+    }).eq("id", uid);
 
     const { data: courses } = await supabase.from("courses").select("id");
     if (courses?.length) {
       const enrollments = courses.map((c) => ({ student_id: uid, course_id: c.id }));
       await supabase.from("enrollments").upsert(enrollments, {
-        onConflict: "student_id,course_id",
-        ignoreDuplicates: true,
+        onConflict: "student_id,course_id", ignoreDuplicates: true,
       });
     }
-
     setSaving(false);
     onDone();
   };
 
+  const allSubjects = ["Mathematics", "Physics", "Chemistry", "Biology", "Science", "English", "Kannada", "Hindi", "Social Science", "Commerce", "Computer Science"];
+  const classes = ["Class 1","Class 2","Class 3","Class 4","Class 5","Class 6","Class 7","Class 8","Class 9","Class 10","Class 11","Class 12"];
+  const boards = ["ICSE", "CBSE", "Karnataka State Board", "ISC"];
+
+  const step1Valid = form.full_name.trim() && form.phone.length >= 10 && form.parent_name.trim();
+  const step2Valid = form.class_level && form.school_name.trim() && form.board;
+  const step3Valid = form.subjects.length > 0;
+
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ ...card, maxWidth: 420, width: "100%", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>{icons.logo(44)}</div>
-        <h2 style={{ color: C.navy, fontFamily: "Georgia,serif", margin: "0 0 8px" }}>One Last Step</h2>
-        <p style={{ color: C.muted, fontSize: 14, margin: "0 0 28px" }}>Please enter your phone number so your teacher can reach you.</p>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#f1f5f9", borderRadius: 10, padding: "4px 12px", marginBottom: 20 }}>
-          {icons.phone(18)}
-          <input
-            value={phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-            placeholder="+91 98765 43210"
-            maxLength={15}
-            style={{ ...inp, background: "transparent", border: "none", padding: "8px 4px", flex: 1 }}
-          />
+    <div style={{ minHeight: "100vh", background: `linear-gradient(135deg, ${C.navy} 0%, #0f1f40 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ ...card, maxWidth: 480, width: "100%" }}>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>{icons.logo(44)}</div>
+          <h2 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 4px", fontSize: 22 }}>Welcome to SDET! 🎉</h2>
+          <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>Complete your profile to get started</p>
         </div>
-        <button
-          onClick={save}
-          disabled={saving || phone.length < 10}
-          style={{ ...btn("primary"), width: "100%", justifyContent: "center", opacity: phone.length < 10 ? 0.6 : 1 }}
-        >
-          {saving ? "Saving…" : "Join SDET Platform"}
-        </button>
+
+        {/* Progress */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 28 }}>
+          {[1,2,3].map(s => (
+            <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: s <= step ? C.navy : "#e2e8f0" }} />
+          ))}
+        </div>
+
+        {/* Step 1 — Personal Info */}
+        {step === 1 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ fontWeight: 700, color: C.navy, fontSize: 15, marginBottom: 4 }}>👤 Personal Information</div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Full Name *</label>
+              <input value={form.full_name} onChange={e => set("full_name", e.target.value)} placeholder="Enter your full name" style={inp} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Phone Number *</label>
+              <input value={form.phone} onChange={e => set("phone", e.target.value.replace(/\D/g, ""))} placeholder="e.g. 9876543210" maxLength={10} style={inp} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Parent / Guardian Name *</label>
+              <input value={form.parent_name} onChange={e => set("parent_name", e.target.value)} placeholder="Enter parent's full name" style={inp} />
+            </div>
+            <button onClick={() => setStep(2)} disabled={!step1Valid}
+              style={{ ...btn("primary"), justifyContent: "center", opacity: step1Valid ? 1 : 0.5, marginTop: 8 }}>
+              Next →
+            </button>
+          </div>
+        )}
+
+        {/* Step 2 — Academic Info */}
+        {step === 2 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ fontWeight: 700, color: C.navy, fontSize: 15, marginBottom: 4 }}>🏫 Academic Details</div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Class *</label>
+              <select value={form.class_level} onChange={e => set("class_level", e.target.value)} style={{ ...inp }}>
+                <option value="">Select your class</option>
+                {classes.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Board *</label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {boards.map(b => (
+                  <button key={b} onClick={() => set("board", b)}
+                    style={{ padding: "10px 14px", borderRadius: 8, border: `1.5px solid ${form.board === b ? C.navy : C.border}`, background: form.board === b ? C.navy : "#fff", color: form.board === b ? "#fff" : C.text, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                    {b}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>School Name *</label>
+              <input value={form.school_name} onChange={e => set("school_name", e.target.value)} placeholder="Enter your school name" style={inp} />
+            </div>
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <button onClick={() => setStep(1)} style={{ ...btn("outline"), flex: 1, justifyContent: "center" }}>← Back</button>
+              <button onClick={() => setStep(3)} disabled={!step2Valid}
+                style={{ ...btn("primary"), flex: 2, justifyContent: "center", opacity: step2Valid ? 1 : 0.5 }}>
+                Next →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3 — Subjects */}
+        {step === 3 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ fontWeight: 700, color: C.navy, fontSize: 15, marginBottom: 4 }}>📚 Subjects Needed</div>
+            <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>Select all subjects you need coaching for:</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {allSubjects.map(s => (
+                <button key={s} onClick={() => toggleSubject(s)}
+                  style={{ padding: "8px 16px", borderRadius: 20, border: `1.5px solid ${form.subjects.includes(s) ? C.navy : C.border}`, background: form.subjects.includes(s) ? C.navy : "#fff", color: form.subjects.includes(s) ? "#fff" : C.text, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                  {form.subjects.includes(s) ? "✓ " : ""}{s}
+                </button>
+              ))}
+            </div>
+            {form.subjects.length > 0 && (
+              <div style={{ background: "#f0fdf4", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: C.green }}>
+                ✓ Selected: {form.subjects.join(", ")}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <button onClick={() => setStep(2)} style={{ ...btn("outline"), flex: 1, justifyContent: "center" }}>← Back</button>
+              <button onClick={save} disabled={!step3Valid || saving}
+                style={{ ...btn("gold"), flex: 2, justifyContent: "center", opacity: step3Valid ? 1 : 0.5 }}>
+                {saving ? "Saving…" : "🎉 Join SDET!"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
