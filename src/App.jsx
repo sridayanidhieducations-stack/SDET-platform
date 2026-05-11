@@ -651,12 +651,16 @@ function PhoneCollect({ uid, onDone }) {
       teacher_id: form.teacher_id || null,
     }).eq("id", uid);
 
-    const { data: courses } = await supabase.from("courses").select("id");
-    if (courses?.length) {
-      const enrollments = courses.map((c) => ({ student_id: uid, course_id: c.id }));
-      await supabase.from("enrollments").upsert(enrollments, {
-        onConflict: "student_id,course_id", ignoreDuplicates: true,
-      });
+    // Only enroll in courses matching student's selected subjects
+    const { data: courses } = await supabase.from("courses").select("id,subject");
+    if (courses?.length && form.subjects.length > 0) {
+      const matchingCourses = courses.filter(c => form.subjects.some(s => c.subject?.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(c.subject?.toLowerCase())));
+      if (matchingCourses.length > 0) {
+        const enrollments = matchingCourses.map((c) => ({ student_id: uid, course_id: c.id }));
+        await supabase.from("enrollments").upsert(enrollments, {
+          onConflict: "student_id,course_id", ignoreDuplicates: true,
+        });
+      }
     }
     setSaving(false);
     onDone();
@@ -1588,6 +1592,7 @@ function StudentApp({ profile, onRefresh }) {
             { id: "home", label: "Home", icon: icons.home },
             { id: "worksheets", label: "Worksheets", icon: icons.worksheet },
             { id: "submissions", label: "My Work", icon: icons.submit },
+            { id: "profile", label: "My Profile", icon: icons.phone },
           ].map((n) => (
             <button key={n.id} onClick={() => setTab(n.id)}
               style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 13, fontWeight: tab === n.id ? 700 : 400, background: tab === n.id ? "#f59e0b1a" : "transparent", color: tab === n.id ? "#f59e0b" : "#94a3b8" }}>
