@@ -341,6 +341,7 @@ function LoginPage() {
         }
         .sdet-mobile { display: none; flex-direction: column; }
         .sdet-hamburger { display: none; }
+        .sdet-desktop { display: flex; }
       `}</style>
 
       {/* Modal */}
@@ -401,27 +402,32 @@ function LoginPage() {
           ))}
         </div>
         {/* Mobile hamburger */}
-        <div className="sdet-hamburger" style={{ position: "relative" }}>
+        <div className="sdet-hamburger" style={{ position: "relative", zIndex: 200 }}>
           <button onClick={() => setMenuOpen(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", flexDirection: "column", gap: 5 }}>
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
           </button>
           {menuOpen && (
-            <div style={{ position: "absolute", right: 0, top: 48, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 180, zIndex: 100, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
-              {["About Us", "Courses", "Teachers", "Contact"].map(item => (
-                <div key={item} onClick={() => { setModal(item); setMenuOpen(false); }}
-                  style={{ padding: "14px 20px", color: "rgba(255,255,255,0.85)", fontSize: 15, cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                  {item}
-                </div>
-              ))}
-            </div>
+            <>
+              {/* Backdrop to close menu */}
+              <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 198 }} />
+              <div style={{ position: "absolute", right: 0, top: 48, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 200, zIndex: 199, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
+                {["About Us", "Courses", "Teachers", "Contact"].map(item => (
+                  <div key={item}
+                    onClick={() => { setModal(item); setMenuOpen(false); }}
+                    style={{ padding: "16px 24px", color: "#fff", fontSize: 15, cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.08)", fontWeight: 500 }}>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </nav>
 
       {/* Desktop layout */}
-      <div className="sdet-desktop" style={{ position: "relative", zIndex: 2, flex: 1, flexDirection: "row", alignItems: "center", padding: "40px 48px", gap: 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
+      <div className="sdet-desktop" style={{ position: "relative", zIndex: 2, display: "flex", flex: 1, flexDirection: "row", alignItems: "center", padding: "40px 48px", gap: 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 20, letterSpacing: 1 }}>EST. — BENGALURU</div>
           <h1 style={{ margin: "0 0 6px", fontSize: 42, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.15 }}>Sri Dayanidhi<br />Educational Trust</h1>
@@ -460,7 +466,7 @@ function LoginPage() {
       </div>
 
       {/* Footer — desktop */}
-      <div className="sdet-desktop" style={{ position: "relative", zIndex: 2, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 48px", justifyContent: "space-between", alignItems: "center" }}>
+      <div className="sdet-desktop" style={{ position: "relative", zIndex: 2, display: "flex", borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 48px", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>sdet-platform.vercel.app</span>
         <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>Physics · Mathematics · Chemistry · Biology · English</span>
       </div>
