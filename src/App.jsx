@@ -1865,18 +1865,18 @@ function StudentProfile({ profile, onRefresh }) {
       <Section title="👤 Personal Information">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <Field label="Full Name">
-            <input value={form.full_name} onChange={e => set("full_name", e.target.value)} placeholder="Your full name" style={inp} />
+            <input key="full_name" defaultValue={form.full_name} onBlur={e => set("full_name", e.target.value)} placeholder="Your full name" style={inp} />
           </Field>
           <Field label="Date of Birth">
-            <input type="date" value={form.date_of_birth} onChange={e => set("date_of_birth", e.target.value)} style={inp} />
+            <input key="dob" type="date" defaultValue={form.date_of_birth} onBlur={e => set("date_of_birth", e.target.value)} style={inp} />
           </Field>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <Field label="Phone Number">
-            <input value={form.phone} onChange={e => set("phone", e.target.value.replace(/\D/g, ""))} placeholder="Your phone" maxLength={10} style={inp} />
+            <input key="phone" type="tel" defaultValue={form.phone} onBlur={e => set("phone", e.target.value)} placeholder="Your phone" maxLength={10} style={inp} />
           </Field>
           <Field label="Gender">
-            <select value={form.gender} onChange={e => set("gender", e.target.value)} style={inp}>
+            <select key="gender" defaultValue={form.gender} onChange={e => set("gender", e.target.value)} style={inp}>
               <option value="">Select gender</option>
               <option>Male</option>
               <option>Female</option>
@@ -1885,7 +1885,7 @@ function StudentProfile({ profile, onRefresh }) {
           </Field>
         </div>
         <Field label="Address">
-          <textarea value={form.address} onChange={e => set("address", e.target.value)} placeholder="Your full address" rows={2} style={{ ...inp, resize: "vertical" }} />
+          <textarea key="address" defaultValue={form.address} onBlur={e => set("address", e.target.value)} placeholder="Your full address" rows={3} style={{ ...inp, resize: "vertical" }} />
         </Field>
       </Section>
 
@@ -1893,10 +1893,10 @@ function StudentProfile({ profile, onRefresh }) {
       <Section title="👨‍👩‍👦 Parent / Guardian Information">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <Field label="Parent / Guardian Name">
-            <input value={form.parent_name} onChange={e => set("parent_name", e.target.value)} placeholder="Parent's full name" style={inp} />
+            <input key="parent_name" defaultValue={form.parent_name} onBlur={e => set("parent_name", e.target.value)} placeholder="Parent's full name" style={inp} />
           </Field>
           <Field label="Parent Phone Number">
-            <input value={form.parent_phone} onChange={e => set("parent_phone", e.target.value.replace(/\D/g, ""))} placeholder="Parent's phone" maxLength={10} style={inp} />
+            <input key="parent_phone" type="tel" defaultValue={form.parent_phone} onBlur={e => set("parent_phone", e.target.value)} placeholder="Parent's phone" maxLength={10} style={inp} />
           </Field>
         </div>
       </Section>
@@ -1905,20 +1905,20 @@ function StudentProfile({ profile, onRefresh }) {
       <Section title="🏫 Academic Information">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <Field label="Class">
-            <select value={form.class_level} onChange={e => set("class_level", e.target.value)} style={inp}>
+            <select key="class" defaultValue={form.class_level} onChange={e => set("class_level", e.target.value)} style={inp}>
               <option value="">Select class</option>
               {classes.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </Field>
           <Field label="Board">
-            <select value={form.board} onChange={e => set("board", e.target.value)} style={inp}>
+            <select key="board" defaultValue={form.board} onChange={e => set("board", e.target.value)} style={inp}>
               <option value="">Select board</option>
               {boards.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
           </Field>
         </div>
         <Field label="School Name">
-          <input value={form.school_name} onChange={e => set("school_name", e.target.value)} placeholder="Your school name" style={inp} />
+          <input key="school" defaultValue={form.school_name} onBlur={e => set("school_name", e.target.value)} placeholder="Your school name" style={inp} />
         </Field>
         <Field label="Subjects Needed for Coaching">
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
@@ -1931,17 +1931,17 @@ function StudentProfile({ profile, onRefresh }) {
           </div>
         </Field>
         <Field label="Previous Year Marks / Percentage">
-          <input value={form.previous_marks} onChange={e => set("previous_marks", e.target.value)} placeholder="e.g. 78% in Class 9, weak in Physics" style={inp} />
+          <input key="marks" defaultValue={form.previous_marks} onBlur={e => set("previous_marks", e.target.value)} placeholder="e.g. 78% in Class 9, weak in Physics" style={inp} />
         </Field>
       </Section>
 
       {/* Goals & Background */}
       <Section title="🎯 Goals & Background">
         <Field label="Learning Goals">
-          <textarea value={form.learning_goals} onChange={e => set("learning_goals", e.target.value)} placeholder="What do you want to achieve? e.g. Score 90%+ in boards, understand Physics concepts..." rows={3} style={{ ...inp, resize: "vertical" }} />
+          <textarea key="goals" defaultValue={form.learning_goals} onBlur={e => set("learning_goals", e.target.value)} placeholder="What do you want to achieve? e.g. Score 90%+ in boards, understand Physics concepts..." rows={3} style={{ ...inp, resize: "vertical" }} />
         </Field>
         <Field label="How did you hear about SDET?">
-          <select value={form.heard_about_sdet} onChange={e => set("heard_about_sdet", e.target.value)} style={inp}>
+          <select key="heard" defaultValue={form.heard_about_sdet} onChange={e => set("heard_about_sdet", e.target.value)} style={inp}>
             <option value="">Select an option</option>
             <option>Friend / Classmate</option>
             <option>Parent / Family</option>
