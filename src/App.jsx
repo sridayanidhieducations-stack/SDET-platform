@@ -360,6 +360,32 @@ function LoginPage() {
         </div>
       )}
 
+      {/* Mobile full-screen menu */}
+      {menuOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 400, background: "#0f1e3d", display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {icons.logo(28)}
+              <span style={{ color: "#d4a017", fontWeight: 700, fontSize: 14, fontFamily: "'Playfair Display',serif" }}>SDET</span>
+            </div>
+            <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#fff", fontSize: 28, lineHeight: 1, padding: 4 }}>×</button>
+          </div>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "24px 0" }}>
+            {["About Us", "Courses", "Teachers", "Contact"].map((item, i) => (
+              <button key={item}
+                onClick={() => { setMenuOpen(false); setTimeout(() => setModal(item), 100); }}
+                style={{ padding: "20px 28px", color: "#fff", fontSize: 20, fontWeight: 600, background: "none", border: "none", borderBottom: "1px solid rgba(255,255,255,0.08)", textAlign: "left", cursor: "pointer", fontFamily: "'Lato',sans-serif", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                {item}
+                <span style={{ color: "#d4a017", fontSize: 18 }}>›</span>
+              </button>
+            ))}
+          </div>
+          <div style={{ padding: "20px 28px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: 0, textAlign: "center" }}>© 2026 Sri Dayanidhi Educational Trust</p>
+          </div>
+        </div>
+      )}
+
       {/* Background */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden" }}>
         <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" style={{ width: "100%", height: "100%", opacity: 0.08 }}>
@@ -402,27 +428,12 @@ function LoginPage() {
           ))}
         </div>
         {/* Mobile hamburger */}
-        <div className="sdet-hamburger" style={{ position: "relative", zIndex: 50 }}>
+        <div className="sdet-hamburger" style={{ position: "relative" }}>
           <button onClick={() => setMenuOpen(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", flexDirection: "column", gap: 5 }}>
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
           </button>
-          {menuOpen && (
-            <>
-              {/* Backdrop to close menu */}
-              <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 48 }} />
-              <div style={{ position: "absolute", right: 0, top: 48, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 200, zIndex: 49, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
-                {["About Us", "Courses", "Teachers", "Contact"].map(item => (
-                  <div key={item}
-                    onClick={() => { setModal(item); setMenuOpen(false); }}
-                    style={{ padding: "16px 24px", color: "#fff", fontSize: 15, cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.08)", fontWeight: 500 }}>
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
         </div>
       </nav>
 
