@@ -346,7 +346,7 @@ function LoginPage() {
 
       {/* Modal */}
       {modal && (
-        <div onClick={() => setModal(null)} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div onClick={() => setModal(null)} style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 680, maxHeight: "85vh", overflowY: "auto", boxShadow: "0 32px 80px rgba(0,0,0,0.4)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 28px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, background: "#fff", zIndex: 1, borderRadius: "20px 20px 0 0" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -402,7 +402,7 @@ function LoginPage() {
           ))}
         </div>
         {/* Mobile hamburger */}
-        <div className="sdet-hamburger" style={{ position: "relative", zIndex: 200 }}>
+        <div className="sdet-hamburger" style={{ position: "relative", zIndex: 50 }}>
           <button onClick={() => setMenuOpen(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", flexDirection: "column", gap: 5 }}>
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
@@ -411,8 +411,8 @@ function LoginPage() {
           {menuOpen && (
             <>
               {/* Backdrop to close menu */}
-              <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 198 }} />
-              <div style={{ position: "absolute", right: 0, top: 48, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 200, zIndex: 199, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
+              <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 48 }} />
+              <div style={{ position: "absolute", right: 0, top: 48, background: "#1a2744", border: "1px solid rgba(212,160,23,0.3)", borderRadius: 12, padding: "8px 0", minWidth: 200, zIndex: 49, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
                 {["About Us", "Courses", "Teachers", "Contact"].map(item => (
                   <div key={item}
                     onClick={() => { setModal(item); setMenuOpen(false); }}
