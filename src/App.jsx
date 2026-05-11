@@ -1776,7 +1776,7 @@ function StudentWorksheets({ worksheets, submissions, profile, onRefresh }) {
 
 // ─── STUDENT PROFILE ──────────────────────────────────────────────────────────
 function StudentProfile({ profile, onRefresh }) {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     full_name: profile.full_name || "",
     phone: profile.phone || "",
     parent_name: profile.parent_name || "",
@@ -1791,7 +1791,7 @@ function StudentProfile({ profile, onRefresh }) {
     previous_marks: profile.previous_marks || "",
     learning_goals: profile.learning_goals || "",
     heard_about_sdet: profile.heard_about_sdet || "",
-  });
+  }));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -1823,7 +1823,6 @@ function StudentProfile({ profile, onRefresh }) {
     }).eq("id", profile.id);
     setSaving(false);
     setSaved(true);
-    onRefresh();
     setTimeout(() => setSaved(false), 3000);
   };
 
@@ -1969,7 +1968,7 @@ function StudentProfile({ profile, onRefresh }) {
 
 // ─── TEACHER PROFILE ──────────────────────────────────────────────────────────
 function TeacherProfile({ profile, onRefresh }) {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     full_name: profile.full_name || "",
     phone: profile.phone || "",
     subject: profile.subject || "",
@@ -1978,7 +1977,7 @@ function TeacherProfile({ profile, onRefresh }) {
     experience: profile.experience || "",
     linkedin: profile.linkedin || "",
     avatar_url: profile.avatar_url || "",
-  });
+  }));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
