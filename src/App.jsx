@@ -1608,6 +1608,7 @@ function StudentApp({ profile, onRefresh }) {
             { id: "home", label: "Home", icon: icons.home },
             { id: "worksheets", label: "Worksheets", icon: icons.worksheet },
             { id: "submissions", label: "My Work", icon: icons.submit },
+            { id: "profile", label: "Profile", icon: icons.phone },
           ].map((n) => (
             <button key={n.id} onClick={() => setTab(n.id)}
               style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 10, fontWeight: tab === n.id ? 700 : 400, background: "transparent", color: tab === n.id ? "#f59e0b" : "#64748b" }}>
@@ -1650,6 +1651,10 @@ function StudentApp({ profile, onRefresh }) {
 
         {tab === "worksheets" && (
           <StudentWorksheets worksheets={worksheets} submissions={submissions} profile={profile} onRefresh={loadStudentData} />
+        )}
+
+        {tab === "profile" && (
+          <StudentProfile profile={profile} onRefresh={onRefresh} />
         )}
 
         {tab === "submissions" && (
@@ -1759,6 +1764,199 @@ function StudentWorksheets({ worksheets, submissions, profile, onRefresh }) {
         {worksheets.length === 0 && (
           <p style={{ color: C.muted, textAlign: "center", padding: 32 }}>No worksheets shared yet. Check back soon!</p>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ─── STUDENT PROFILE ──────────────────────────────────────────────────────────
+function StudentProfile({ profile, onRefresh }) {
+  const [form, setForm] = useState({
+    full_name: profile.full_name || "",
+    phone: profile.phone || "",
+    parent_name: profile.parent_name || "",
+    parent_phone: profile.parent_phone || "",
+    date_of_birth: profile.date_of_birth || "",
+    gender: profile.gender || "",
+    address: profile.address || "",
+    class_level: profile.class_level || "",
+    board: profile.board || "",
+    school_name: profile.school_name || "",
+    subjects: profile.subjects || [],
+    previous_marks: profile.previous_marks || "",
+    learning_goals: profile.learning_goals || "",
+    heard_about_sdet: profile.heard_about_sdet || "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const toggleSubject = (s) => {
+    setForm(f => ({
+      ...f,
+      subjects: f.subjects.includes(s) ? f.subjects.filter(x => x !== s) : [...f.subjects, s]
+    }));
+  };
+
+  const save = async () => {
+    setSaving(true);
+    await supabase.from("profiles").update({
+      full_name: form.full_name,
+      phone: form.phone,
+      parent_name: form.parent_name,
+      parent_phone: form.parent_phone,
+      date_of_birth: form.date_of_birth,
+      gender: form.gender,
+      address: form.address,
+      class_level: form.class_level,
+      board: form.board,
+      school_name: form.school_name,
+      subjects: form.subjects,
+      previous_marks: form.previous_marks,
+      learning_goals: form.learning_goals,
+      heard_about_sdet: form.heard_about_sdet,
+    }).eq("id", profile.id);
+    setSaving(false);
+    setSaved(true);
+    onRefresh();
+    setTimeout(() => setSaved(false), 3000);
+  };
+
+  const allSubjects = ["Mathematics", "Physics", "Chemistry", "Biology", "Science", "English", "Kannada", "Hindi", "Social Science", "Commerce", "Computer Science"];
+  const boards = ["ICSE", "CBSE", "Karnataka State Board", "ISC"];
+  const classes = ["Class 1","Class 2","Class 3","Class 4","Class 5","Class 6","Class 7","Class 8","Class 9","Class 10","Class 11","Class 12"];
+
+  const Section = ({ title, children }) => (
+    <div style={{ ...card, marginBottom: 20 }}>
+      <div style={{ fontWeight: 700, color: C.navy, fontSize: 15, marginBottom: 20, paddingBottom: 12, borderBottom: `1px solid ${C.border}` }}>{title}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>{children}</div>
+    </div>
+  );
+
+  const Field = ({ label, children }) => (
+    <div>
+      <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 6 }}>{label}</label>
+      {children}
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth: 720 }}>
+      <h2 style={{ margin: "0 0 4px", fontFamily: "'Playfair Display',serif", color: C.navy, fontSize: 24 }}>My Profile</h2>
+      <p style={{ margin: "0 0 24px", color: C.muted, fontSize: 14 }}>Keep your profile updated so your teacher knows your needs.</p>
+
+      {/* Profile Summary Card */}
+      <div style={{ ...card, marginBottom: 20, background: "linear-gradient(135deg,#1a2744 0%,#0f3460 100%)", border: "none", display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#d4a017", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, fontWeight: 700, color: C.navy, flexShrink: 0 }}>
+          {(form.full_name || profile.full_name || "S")[0]}
+        </div>
+        <div>
+          <div style={{ color: "#fff", fontWeight: 700, fontSize: 18 }}>{form.full_name || profile.full_name}</div>
+          <div style={{ color: "#94a3b8", fontSize: 13, marginTop: 2 }}>{form.class_level || "Class not set"} · {form.board || "Board not set"}</div>
+          <div style={{ color: "#94a3b8", fontSize: 13 }}>{form.school_name || "School not set"}</div>
+        </div>
+      </div>
+
+      {/* Personal Info */}
+      <Section title="👤 Personal Information">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <Field label="Full Name">
+            <input value={form.full_name} onChange={e => set("full_name", e.target.value)} placeholder="Your full name" style={inp} />
+          </Field>
+          <Field label="Date of Birth">
+            <input type="date" value={form.date_of_birth} onChange={e => set("date_of_birth", e.target.value)} style={inp} />
+          </Field>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <Field label="Phone Number">
+            <input value={form.phone} onChange={e => set("phone", e.target.value.replace(/\D/g, ""))} placeholder="Your phone" maxLength={10} style={inp} />
+          </Field>
+          <Field label="Gender">
+            <select value={form.gender} onChange={e => set("gender", e.target.value)} style={inp}>
+              <option value="">Select gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </Field>
+        </div>
+        <Field label="Address">
+          <textarea value={form.address} onChange={e => set("address", e.target.value)} placeholder="Your full address" rows={2} style={{ ...inp, resize: "vertical" }} />
+        </Field>
+      </Section>
+
+      {/* Parent Info */}
+      <Section title="👨‍👩‍👦 Parent / Guardian Information">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <Field label="Parent / Guardian Name">
+            <input value={form.parent_name} onChange={e => set("parent_name", e.target.value)} placeholder="Parent's full name" style={inp} />
+          </Field>
+          <Field label="Parent Phone Number">
+            <input value={form.parent_phone} onChange={e => set("parent_phone", e.target.value.replace(/\D/g, ""))} placeholder="Parent's phone" maxLength={10} style={inp} />
+          </Field>
+        </div>
+      </Section>
+
+      {/* Academic Info */}
+      <Section title="🏫 Academic Information">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <Field label="Class">
+            <select value={form.class_level} onChange={e => set("class_level", e.target.value)} style={inp}>
+              <option value="">Select class</option>
+              {classes.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </Field>
+          <Field label="Board">
+            <select value={form.board} onChange={e => set("board", e.target.value)} style={inp}>
+              <option value="">Select board</option>
+              {boards.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+          </Field>
+        </div>
+        <Field label="School Name">
+          <input value={form.school_name} onChange={e => set("school_name", e.target.value)} placeholder="Your school name" style={inp} />
+        </Field>
+        <Field label="Subjects Needed for Coaching">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
+            {allSubjects.map(s => (
+              <button key={s} onClick={() => toggleSubject(s)}
+                style={{ padding: "7px 14px", borderRadius: 20, border: `1.5px solid ${form.subjects.includes(s) ? C.navy : C.border}`, background: form.subjects.includes(s) ? C.navy : "#fff", color: form.subjects.includes(s) ? "#fff" : C.text, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                {form.subjects.includes(s) ? "✓ " : ""}{s}
+              </button>
+            ))}
+          </div>
+        </Field>
+        <Field label="Previous Year Marks / Percentage">
+          <input value={form.previous_marks} onChange={e => set("previous_marks", e.target.value)} placeholder="e.g. 78% in Class 9, weak in Physics" style={inp} />
+        </Field>
+      </Section>
+
+      {/* Goals & Background */}
+      <Section title="🎯 Goals & Background">
+        <Field label="Learning Goals">
+          <textarea value={form.learning_goals} onChange={e => set("learning_goals", e.target.value)} placeholder="What do you want to achieve? e.g. Score 90%+ in boards, understand Physics concepts..." rows={3} style={{ ...inp, resize: "vertical" }} />
+        </Field>
+        <Field label="How did you hear about SDET?">
+          <select value={form.heard_about_sdet} onChange={e => set("heard_about_sdet", e.target.value)} style={inp}>
+            <option value="">Select an option</option>
+            <option>Friend / Classmate</option>
+            <option>Parent / Family</option>
+            <option>School Teacher</option>
+            <option>Social Media</option>
+            <option>Google Search</option>
+            <option>WhatsApp</option>
+            <option>Other</option>
+          </select>
+        </Field>
+      </Section>
+
+      {/* Save Button */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
+        <button onClick={save} disabled={saving}
+          style={{ ...btn("gold"), opacity: saving ? 0.7 : 1 }}>
+          {saving ? "Saving…" : "💾 Save Profile"}
+        </button>
+        {saved && <span style={{ color: C.green, fontWeight: 700, fontSize: 14 }}>✓ Profile saved successfully!</span>}
       </div>
     </div>
   );
