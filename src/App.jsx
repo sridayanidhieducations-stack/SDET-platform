@@ -822,6 +822,7 @@ function TeacherApp({ profile, onRefresh }) {
     { id: "worksheets", label: "Worksheets", icon: icons.worksheet },
     { id: "submissions", label: "Submissions", icon: icons.submit },
     { id: "progress", label: "Progress", icon: icons.chart },
+    { id: "notes", label: "Notes", icon: icons.book },
     { id: "profile", label: "My Profile", icon: icons.phone },
     ...(profile.role === "admin" ? [{ id: "teachers", label: "Teachers", icon: icons.teacher }] : []),
   ];
@@ -894,6 +895,7 @@ function TeacherApp({ profile, onRefresh }) {
         {tab === "worksheets" && <WorksheetsView worksheets={worksheets} courses={courses} profile={profile} onRefresh={loadAll} />}
         {tab === "submissions" && <SubmissionsView submissions={submissions} worksheets={worksheets} onRefresh={loadAll} />}
         {tab === "progress" && <ProgressView students={students} submissions={submissions} />}
+        {tab === "notes" && <NotesView courses={courses} profile={profile} />}
         {tab === "profile" && <TeacherProfile profile={profile} onRefresh={onRefresh} />}
         {tab === "teachers" && <TeachersView profile={profile} />}
       </main>
@@ -1326,6 +1328,17 @@ function SubmissionCard({ sub, onEvaluate, evaluating }) {
           <div style={{ textAlign: "center", padding: "8px 20px", borderRadius: 10, background: sub.score >= 7 ? "#d1fae5" : sub.score >= 5 ? "#fef3c7" : "#fee2e2" }}>
             <div style={{ fontSize: 22, fontWeight: 900, color: sub.score >= 7 ? C.green : sub.score >= 5 ? "#d97706" : C.red }}>{sub.score}/10</div>
           </div>
+        ) : sub.pdf_url ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+            <a href={sub.pdf_url} target="_blank" rel="noreferrer"
+              style={{ ...btn("outline"), textDecoration: "none", padding: "6px 14px", fontSize: 12 }}>
+              ⬇ Download
+            </a>
+            <button onClick={(e) => { e.stopPropagation(); onEvaluate && onEvaluate(); }} disabled={evaluating}
+              style={{ ...btn("primary"), padding: "6px 14px", fontSize: 12, opacity: evaluating ? 0.7 : 1 }}>
+              {evaluating ? "Saving…" : "Enter Marks"}
+            </button>
+          </div>
         ) : (
           <button
             onClick={(e) => { e.stopPropagation(); onEvaluate && onEvaluate(); }}
@@ -1338,9 +1351,22 @@ function SubmissionCard({ sub, onEvaluate, evaluating }) {
       </div>
       {open && (
         <div style={{ padding: "0 24px 20px", borderTop: `1px solid ${C.border}` }}>
-          <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16, fontSize: 14, color: C.text, margin: "16px 0 0", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
-            {sub.content}
-          </div>
+          {sub.pdf_url ? (
+            <div style={{ background: "#f0f9ff", borderRadius: 10, padding: 16, margin: "16px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontWeight: 700, color: C.navy, fontSize: 14 }}>📄 PDF Answer Sheet</div>
+                <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{sub.file_name || "answer-sheet.pdf"}</div>
+              </div>
+              <a href={sub.pdf_url} target="_blank" rel="noreferrer" download
+                style={{ ...btn("primary"), textDecoration: "none", padding: "8px 18px", fontSize: 13 }}>
+                ⬇ Download PDF
+              </a>
+            </div>
+          ) : (
+            <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16, fontSize: 14, color: C.text, margin: "16px 0 0", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+              {sub.content}
+            </div>
+          )}
           {sub.feedback && (
             <div style={{ background: "#f0fdf4", border: `1px solid #bbf7d0`, borderRadius: 10, padding: 16, marginTop: 12, fontSize: 14, color: C.text, lineHeight: 1.7 }}>
               <strong style={{ color: C.green }}>AI Feedback:</strong> {sub.feedback}
@@ -1591,6 +1617,7 @@ function StudentApp({ profile, onRefresh }) {
           {[
             { id: "home", label: "Home", icon: icons.home },
             { id: "worksheets", label: "Worksheets", icon: icons.worksheet },
+            { id: "notes", label: "Notes", icon: icons.book },
             { id: "submissions", label: "My Work", icon: icons.submit },
             { id: "profile", label: "My Profile", icon: icons.phone },
           ].map((n) => (
@@ -1611,13 +1638,14 @@ function StudentApp({ profile, onRefresh }) {
         <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: C.navy, borderTop: "1px solid #ffffff18", display: "flex", zIndex: 20, height: 60 }}>
           {[
             { id: "home", label: "Home", icon: icons.home },
-            { id: "worksheets", label: "Worksheets", icon: icons.worksheet },
-            { id: "submissions", label: "My Work", icon: icons.submit },
+            { id: "worksheets", label: "Work", icon: icons.worksheet },
+            { id: "notes", label: "Notes", icon: icons.book },
+            { id: "submissions", label: "Results", icon: icons.submit },
             { id: "profile", label: "Profile", icon: icons.phone },
           ].map((n) => (
             <button key={n.id} onClick={() => setTab(n.id)}
-              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 10, fontWeight: tab === n.id ? 700 : 400, background: "transparent", color: tab === n.id ? "#f59e0b" : "#64748b" }}>
-              {n.icon(20)} {n.label}
+              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 9, fontWeight: tab === n.id ? 700 : 400, background: "transparent", color: tab === n.id ? "#f59e0b" : "#64748b" }}>
+              {n.icon(18)} {n.label}
             </button>
           ))}
         </div>
@@ -1662,6 +1690,10 @@ function StudentApp({ profile, onRefresh }) {
           <StudentProfile profile={profile} onRefresh={onRefresh} />
         )}
 
+        {tab === "notes" && (
+          <StudentNotes enrollments={enrollments} profile={profile} />
+        )}
+
         {tab === "submissions" && (
           <div>
             <h2 style={{ fontFamily: "'Playfair Display',serif", color: C.navy, margin: "0 0 24px", fontSize: 24 }}>My Submissions</h2>
@@ -1700,26 +1732,45 @@ function StudentApp({ profile, onRefresh }) {
 // ─── STUDENT WORKSHEETS ───────────────────────────────────────────────────────
 function StudentWorksheets({ worksheets, submissions, profile, onRefresh }) {
   const [active, setActive] = useState(null);
-  const [answer, setAnswer] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
-  const submit = async (ws) => {
-    if (!answer.trim()) return;
-    setSubmitting(true);
-    await supabase.from("submissions").insert({
-      worksheet_id: ws.id,
-      student_id: profile.id,
-      content: answer,
-    });
-    setAnswer("");
-    setActive(null);
-    setSubmitting(false);
-    onRefresh();
+  const submitPDF = async (ws) => {
+    if (!pdfFile) return;
+    setUploading(true);
+    try {
+      const fileName = `${profile.id}_${ws.id}_${Date.now()}.pdf`;
+      const { data: uploadData, error } = await supabase.storage
+        .from("submissions")
+        .upload(fileName, pdfFile, { contentType: "application/pdf", upsert: true });
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("submissions")
+        .getPublicUrl(fileName);
+
+      await supabase.from("submissions").insert({
+        worksheet_id: ws.id,
+        student_id: profile.id,
+        content: `PDF Answer Sheet: ${pdfFile.name}`,
+        pdf_url: publicUrl,
+        file_name: pdfFile.name,
+      });
+
+      setPdfFile(null);
+      setActive(null);
+      onRefresh();
+    } catch (e) {
+      alert("Upload failed. Please try again.");
+    }
+    setUploading(false);
   };
 
   return (
     <div>
-      <h2 style={{ fontFamily: "'Playfair Display',serif", color: C.navy, margin: "0 0 24px", fontSize: 24 }}>Worksheets</h2>
+      <h2 style={{ fontFamily: "'Playfair Display',serif", color: C.navy, margin: "0 0 8px", fontSize: 24 }}>Worksheets</h2>
+      <p style={{ color: C.muted, fontSize: 13, margin: "0 0 24px" }}>Download questions, write your answers on paper, scan/photograph as PDF and upload.</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {worksheets.map((w) => {
           const submitted = submissions.find((s) => s.worksheet_id === w.id);
@@ -1731,36 +1782,83 @@ function StudentWorksheets({ worksheets, submissions, profile, onRefresh }) {
                   <div style={{ fontSize: 12, color: C.muted }}>{w.questions?.length} questions · {new Date(w.created_at).toLocaleDateString()}</div>
                 </div>
                 {submitted ? (
-                  <span style={{ background: "#d1fae5", color: C.green, padding: "4px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>✓ Submitted</span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                    <span style={{ background: "#d1fae5", color: C.green, padding: "4px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>✓ Submitted</span>
+                    {submitted.score !== null && (
+                      <span style={{ fontWeight: 700, color: submitted.score >= 7 ? C.green : submitted.score >= 5 ? "#d97706" : C.red, fontSize: 14 }}>
+                        Score: {submitted.score}/10
+                      </span>
+                    )}
+                  </div>
                 ) : (
-                  <button onClick={() => { setActive(active === w.id ? null : w.id); setAnswer(""); }}
+                  <button onClick={() => { setActive(active === w.id ? null : w.id); setPdfFile(null); }}
                     style={btn(active === w.id ? "outline" : "primary")}>
-                    {active === w.id ? "Cancel" : "Open & Answer"}
+                    {active === w.id ? "Cancel" : "View & Submit"}
                   </button>
                 )}
               </div>
               {active === w.id && !submitted && (
                 <div>
-                  <ol style={{ margin: "0 0 16px", padding: "0 0 0 20px", display: "flex", flexDirection: "column", gap: 10 }}>
-                    {w.questions?.map((q, i) => (
-                      <li key={i} style={{ fontSize: 14, color: C.text, lineHeight: 1.7 }}>{q}</li>
-                    ))}
-                  </ol>
-                  <textarea
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="Type your answers here… (label each answer: Q1: … Q2: … etc.)"
-                    style={{ ...inp, minHeight: 140, resize: "vertical" }}
-                  />
-                  <div style={{ marginTop: 12, display: "flex", gap: 10 }}>
+                  {/* Questions */}
+                  <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16, marginBottom: 16 }}>
+                    <div style={{ fontWeight: 700, color: C.navy, fontSize: 13, marginBottom: 10 }}>📝 Questions:</div>
+                    <ol style={{ margin: 0, padding: "0 0 0 20px", display: "flex", flexDirection: "column", gap: 10 }}>
+                      {w.questions?.map((q, i) => (
+                        <li key={i} style={{ fontSize: 14, color: C.text, lineHeight: 1.7 }}>{q}</li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {/* PDF Upload */}
+                  <div style={{ background: "#fffbeb", border: "1.5px dashed #fcd34d", borderRadius: 12, padding: 20, textAlign: "center" }}>
+                    <div style={{ fontSize: 32, marginBottom: 8 }}>📄</div>
+                    <div style={{ fontWeight: 700, color: C.navy, marginBottom: 4 }}>Upload Your Answer Sheet</div>
+                    <div style={{ fontSize: 12, color: C.muted, marginBottom: 16 }}>Write answers on paper → Scan or photograph → Save as PDF → Upload</div>
+                    <label style={{ ...btn("primary"), cursor: "pointer", display: "inline-flex", marginBottom: 12 }}>
+                      📁 Choose PDF File
+                      <input type="file" accept=".pdf,image/*" onChange={e => setPdfFile(e.target.files[0])} style={{ display: "none" }} />
+                    </label>
+                    {pdfFile && (
+                      <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: "10px 16px", marginTop: 8, fontSize: 13, color: C.text }}>
+                        ✅ {pdfFile.name} ({(pdfFile.size / 1024).toFixed(0)} KB)
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
                     <button
-                      onClick={() => submit(w)}
-                      disabled={submitting || !answer.trim()}
-                      style={{ ...btn("gold"), opacity: !answer.trim() ? 0.6 : 1 }}
+                      onClick={() => submitPDF(w)}
+                      disabled={uploading || !pdfFile}
+                      style={{ ...btn("gold"), opacity: !pdfFile ? 0.6 : 1 }}
                     >
-                      {submitting ? "Submitting…" : "Submit Answers"}
+                      {uploading ? "Uploading…" : "📤 Submit Answer Sheet"}
                     </button>
                   </div>
+                </div>
+              )}
+
+              {/* Show submitted PDF */}
+              {submitted?.pdf_url && (
+                <div style={{ marginTop: 12, background: "#f0fdf4", borderRadius: 8, padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 13, color: C.text }}>📄 {submitted.file_name || "Answer Sheet"}</span>
+                  <a href={submitted.pdf_url} target="_blank" rel="noreferrer"
+                    style={{ ...btn("outline"), padding: "6px 14px", fontSize: 12, textDecoration: "none" }}>
+                    View PDF
+                  </a>
+                </div>
+              )}
+
+              {/* Show feedback if evaluated */}
+              {submitted?.feedback && (
+                <div style={{ marginTop: 12, background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: 14, fontSize: 13, color: C.text, lineHeight: 1.7 }}>
+                  <strong style={{ color: C.green }}>Feedback:</strong> {submitted.feedback}
+                  {submitted.weak_points?.length > 0 && (
+                    <div style={{ marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      {submitted.weak_points.map((w) => (
+                        <span key={w} style={{ background: "#fee2e2", color: C.red, borderRadius: 6, padding: "3px 10px", fontSize: 11 }}>⚠ {w}</span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -1961,6 +2059,199 @@ function StudentProfile({ profile, onRefresh }) {
           {saving ? "Saving…" : "💾 Save Profile"}
         </button>
         {saved && <span style={{ color: C.green, fontWeight: 700, fontSize: 14 }}>✓ Profile saved successfully!</span>}
+      </div>
+    </div>
+  );
+}
+
+// ─── NOTES VIEW (Teacher) ────────────────────────────────────────────────────
+function NotesView({ courses, profile }) {
+  const [notes, setNotes] = useState([]);
+  const [title, setTitle] = useState("");
+  const [topic, setTopic] = useState("");
+  const [content, setContent] = useState("");
+  const [courseId, setCourseId] = useState("");
+  const [pdfFile, setPdfFile] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [tab, setTab] = useState("list");
+
+  useEffect(() => {
+    supabase.from("notes").select("*").eq("teacher_id", profile.id).order("created_at", { ascending: false })
+      .then(({ data }) => setNotes(data || []));
+  }, []);
+
+  const saveNote = async () => {
+    if (!title.trim() || !courseId) return;
+    setSaving(true);
+    let fileUrl = null, fileName = null;
+
+    if (pdfFile) {
+      const fname = `notes_${profile.id}_${Date.now()}.pdf`;
+      const { error } = await supabase.storage.from("notes").upload(fname, pdfFile, { contentType: "application/pdf", upsert: true });
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage.from("notes").getPublicUrl(fname);
+        fileUrl = publicUrl;
+        fileName = pdfFile.name;
+      }
+    }
+
+    const { data } = await supabase.from("notes").insert({
+      teacher_id: profile.id,
+      course_id: courseId,
+      title, topic,
+      content: content || null,
+      file_url: fileUrl,
+      file_name: fileName,
+    }).select().single();
+
+    setNotes(n => [data, ...n]);
+    setTitle(""); setTopic(""); setContent(""); setCourseId(""); setPdfFile(null);
+    setTab("list");
+    setSaving(false);
+  };
+
+  const deleteNote = async (id) => {
+    await supabase.from("notes").delete().eq("id", id);
+    setNotes(n => n.filter(x => x.id !== id));
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <div>
+          <h2 style={{ margin: 0, fontFamily: "'Playfair Display',serif", color: C.navy, fontSize: 24 }}>Notes & Study Material</h2>
+          <p style={{ margin: "4px 0 0", color: C.muted, fontSize: 14 }}>Share typed notes or PDF files with your students</p>
+        </div>
+        <button onClick={() => setTab(tab === "add" ? "list" : "add")}
+          style={{ ...btn(tab === "add" ? "outline" : "primary") }}>
+          {tab === "add" ? "← Back" : "+ Add Note"}
+        </button>
+      </div>
+
+      {tab === "add" && (
+        <div style={{ ...card, marginBottom: 24 }}>
+          <h3 style={{ margin: "0 0 20px", color: C.navy }}>Add New Note</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Title *</label>
+                <input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Newton's Laws of Motion" style={inp} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Topic</label>
+                <input value={topic} onChange={e => setTopic(e.target.value)} placeholder="e.g. Chapter 3 - Mechanics" style={inp} />
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Course *</label>
+              <select value={courseId} onChange={e => setCourseId(e.target.value)} style={inp}>
+                <option value="">Select course</option>
+                {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Typed Notes (Optional)</label>
+              <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Type your notes here..." rows={6} style={{ ...inp, resize: "vertical" }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: C.text, display: "block", marginBottom: 6 }}>Upload PDF (Optional)</label>
+              <div style={{ background: "#f8fafc", border: "1.5px dashed #e2e8f0", borderRadius: 10, padding: 20, textAlign: "center" }}>
+                <label style={{ ...btn("outline"), cursor: "pointer" }}>
+                  📁 Choose PDF File
+                  <input type="file" accept=".pdf" onChange={e => setPdfFile(e.target.files[0])} style={{ display: "none" }} />
+                </label>
+                {pdfFile && <div style={{ marginTop: 10, fontSize: 13, color: C.green }}>✅ {pdfFile.name}</div>}
+              </div>
+            </div>
+            <button onClick={saveNote} disabled={saving || !title.trim() || !courseId}
+              style={{ ...btn("gold"), opacity: (!title.trim() || !courseId) ? 0.6 : 1 }}>
+              {saving ? "Saving…" : "💾 Save Note"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {notes.map(n => (
+          <div key={n.id} style={{ ...card, padding: "18px 24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, color: C.text, fontSize: 15 }}>{n.title}</div>
+                <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
+                  {n.topic && <span>{n.topic} · </span>}
+                  {new Date(n.created_at).toLocaleDateString()}
+                </div>
+                {n.content && <div style={{ fontSize: 13, color: C.text, marginTop: 10, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{n.content.slice(0, 200)}{n.content.length > 200 ? "…" : ""}</div>}
+                {n.file_url && (
+                  <a href={n.file_url} target="_blank" rel="noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 10, color: "#1d4ed8", fontSize: 13, textDecoration: "none" }}>
+                    📄 {n.file_name || "Download PDF"}
+                  </a>
+                )}
+              </div>
+              <button onClick={() => deleteNote(n.id)}
+                style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 18, marginLeft: 12 }}>🗑</button>
+            </div>
+          </div>
+        ))}
+        {notes.length === 0 && tab !== "add" && <p style={{ color: C.muted, textAlign: "center", padding: 32 }}>No notes yet. Add your first note above!</p>}
+      </div>
+    </div>
+  );
+}
+
+// ─── STUDENT NOTES ────────────────────────────────────────────────────────────
+function StudentNotes({ enrollments, profile }) {
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(null);
+
+  useEffect(() => {
+    if (!enrollments?.length) { setLoading(false); return; }
+    const courseIds = enrollments.map(e => e.course_id);
+    supabase.from("notes").select("*").in("course_id", courseIds).order("created_at", { ascending: false })
+      .then(({ data }) => { setNotes(data || []); setLoading(false); });
+  }, [enrollments]);
+
+  if (loading) return <div style={{ padding: 32, textAlign: "center", color: C.muted }}>Loading notes…</div>;
+
+  return (
+    <div>
+      <h2 style={{ fontFamily: "'Playfair Display',serif", color: C.navy, margin: "0 0 8px", fontSize: 24 }}>Study Notes</h2>
+      <p style={{ color: C.muted, fontSize: 13, margin: "0 0 24px" }}>Notes shared by your teacher for your courses.</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {notes.map(n => (
+          <div key={n.id} style={card}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}
+              onClick={() => setExpanded(expanded === n.id ? null : n.id)}>
+              <div>
+                <div style={{ fontWeight: 700, color: C.text, fontSize: 15 }}>{n.title}</div>
+                <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
+                  {n.topic && <span>{n.topic} · </span>}
+                  {new Date(n.created_at).toLocaleDateString()}
+                  {n.file_url && <span> · 📄 PDF available</span>}
+                </div>
+              </div>
+              <span style={{ color: C.muted, fontSize: 18 }}>{expanded === n.id ? "▲" : "▼"}</span>
+            </div>
+            {expanded === n.id && (
+              <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.border}` }}>
+                {n.content && (
+                  <div style={{ fontSize: 14, color: C.text, lineHeight: 1.8, whiteSpace: "pre-wrap", marginBottom: n.file_url ? 16 : 0 }}>
+                    {n.content}
+                  </div>
+                )}
+                {n.file_url && (
+                  <a href={n.file_url} target="_blank" rel="noreferrer" download
+                    style={{ ...btn("primary"), textDecoration: "none", display: "inline-flex" }}>
+                    ⬇ Download PDF Notes
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+        {notes.length === 0 && <p style={{ color: C.muted, textAlign: "center", padding: 32 }}>No notes shared yet. Check back soon!</p>}
       </div>
     </div>
   );
