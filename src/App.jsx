@@ -1489,6 +1489,15 @@ function TeachersView({ profile }) {
 
   const assignStudentToTeacher = async (studentId, teacherId) => {
     await supabase.from("profiles").update({ teacher_id: teacherId }).eq("id", studentId);
+    
+    if (teacherId) {
+      // Auto-enroll student in all of this teacher's courses
+      const { data: courses } = await supabase.from("courses").select("id").eq("teacher_id", teacherId);
+      if (courses?.length) {
+        const enrollments = courses.map(c => ({ student_id: studentId, course_id: c.id }));
+        await supabase.from("enrollments").upsert(enrollments, { onConflict: "student_id,course_id", ignoreDuplicates: true });
+      }
+    }
   };
 
   return (
