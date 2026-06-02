@@ -127,13 +127,13 @@ export default function App() {
   const fetchProfile = async (uid) => {
     const { data } = await supabase.from("profiles").select("*").eq("id", uid).single();
     if (data && data.role === "student") {
-      const intendedRole = localStorage.getItem("sdet_intended_role");
+      const intendedRole = localStorage.getItem("Heshvi Gurukul_intended_role");
       if (intendedRole === "teacher") {
         await supabase.from("profiles").update({ role: "teacher", approved: false }).eq("id", uid);
         data.role = "teacher";
         data.approved = false;
       }
-      localStorage.removeItem("sdet_intended_role");
+      localStorage.removeItem("Heshvi Gurukul_intended_role");
     }
     setProfile(data);
     setLoading(false);
@@ -183,7 +183,7 @@ function Splash() {
   return (
     <div style={{ minHeight: "100vh", background: C.navy, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
       {icons.logo(48)}
-      <div style={{ color: "#f59e0b", fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700 }}>SDET</div>
+      <div style={{ color: "#f59e0b", fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700 }}>Heshvi Gurukul</div>
       <div style={{ width: 36, height: 3, background: "#f59e0b33", borderRadius: 2, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, background: "#f59e0b", animation: "slide 1s infinite", borderRadius: 2 }} />
       </div>
@@ -208,10 +208,10 @@ function LoginPage() {
       icon: "🏫",
       content: (
         <div>
-          <h3 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 4px", fontSize: 20 }}>Welcome to SDET</h3>
+          <h3 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 4px", fontSize: 20 }}>Welcome to Heshvi Gurukul</h3>
           <p style={{ color: "#d4a017", fontWeight: 700, margin: "0 0 16px", fontSize: 14 }}>Sri Dayanidhi Educational Trust</p>
           <p style={{ color: C.text, fontSize: 14, lineHeight: 1.8, margin: "0 0 14px" }}>Sri Dayanidhi Educational Trust was established with a vision to guide students towards a brighter and more successful future. Founded by <strong>Arun Kumar M N</strong>, the institution is committed to helping students overcome fear, confusion, and challenges related to education and career growth.</p>
-          <p style={{ color: C.text, fontSize: 14, lineHeight: 1.8, margin: "0 0 20px" }}>At SDET, we believe that every student has unique talents and abilities. Our mission is to identify students' strengths, build confidence, and support them in achieving their academic and career goals.</p>
+          <p style={{ color: C.text, fontSize: 14, lineHeight: 1.8, margin: "0 0 20px" }}>At Heshvi Gurukul, we believe that every student has unique talents and abilities. Our mission is to identify students' strengths, build confidence, and support them in achieving their academic and career goals.</p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
             <div style={{ background: "#f0f9ff", borderRadius: 12, padding: 16 }}>
               <div style={{ fontWeight: 700, color: C.navy, marginBottom: 8, fontSize: 13 }}>🎯 Our Mission</div>
@@ -220,7 +220,7 @@ function LoginPage() {
               ))}
             </div>
             <div style={{ background: "#f0fdf4", borderRadius: 12, padding: 16 }}>
-              <div style={{ fontWeight: 700, color: C.navy, marginBottom: 8, fontSize: 13 }}>✅ Why Choose SDET?</div>
+              <div style={{ fontWeight: 700, color: C.navy, marginBottom: 8, fontSize: 13 }}>✅ Why Choose Heshvi Gurukul?</div>
               {["Experienced & student-friendly faculty", "Individual attention and mentoring", "Focus on academic excellence", "Supportive growth environment", "Improves confidence & performance"].map((m, i) => (
                 <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, paddingLeft: 10, borderLeft: "2px solid #059669", marginBottom: 6 }}>{m}</div>
               ))}
@@ -330,14 +330,14 @@ function LoginPage() {
     },
   }).then(() => {
     // Store intended role in localStorage for after redirect
-    localStorage.setItem("sdet_intended_role", role);
+    localStorage.setItem("Heshvi Gurukul_intended_role", role);
   });
 
   const LoginCard = () => (
     <div style={{ background: "#fff", borderRadius: 20, padding: "32px 28px", boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: C.navy, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>{icons.logo(28)}</div>
-        <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Welcome to SDET</div>
+        <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>Welcome to Heshvi Gurukul</div>
         <h3 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800, color: C.navy, fontFamily: "'Playfair Display',serif" }}>Sign in to your account</h3>
         <p style={{ margin: 0, color: C.muted, fontSize: 13 }}>Choose how you want to sign in</p>
       </div>
@@ -370,7 +370,7 @@ function LoginPage() {
       </button>
 
       <p style={{ margin: 0, fontSize: 11, color: C.muted, textAlign: "center", lineHeight: 1.7 }}>
-        By signing in you agree to SDET's terms.<br />
+        By signing in you agree to Heshvi Gurukul's terms.<br />
         New users will complete their profile after sign-in.
       </p>
     </div>
@@ -381,18 +381,18 @@ function LoginPage() {
       <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
       <style>{`
         @media (max-width: 767px) {
-          .sdet-desktop { display: none !important; }
-          .sdet-mobile { display: flex !important; }
-          .sdet-hamburger { display: flex !important; }
-          .sdet-nav-links { display: none !important; }
+          .Heshvi Gurukul-desktop { display: none !important; }
+          .Heshvi Gurukul-mobile { display: flex !important; }
+          .Heshvi Gurukul-hamburger { display: flex !important; }
+          .Heshvi Gurukul-nav-links { display: none !important; }
         }
         @media (min-width: 768px) {
-          .sdet-mobile { display: none !important; }
-          .sdet-hamburger { display: none !important; }
+          .Heshvi Gurukul-mobile { display: none !important; }
+          .Heshvi Gurukul-hamburger { display: none !important; }
         }
-        .sdet-mobile { display: none; flex-direction: column; }
-        .sdet-hamburger { display: none; }
-        .sdet-desktop { display: flex; }
+        .Heshvi Gurukul-mobile { display: none; flex-direction: column; }
+        .Heshvi Gurukul-hamburger { display: none; }
+        .Heshvi Gurukul-desktop { display: flex; }
       `}</style>
 
       {/* Modal */}
@@ -417,7 +417,7 @@ function LoginPage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid rgba(212,160,23,0.25)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               {icons.logo(28)}
-              <span style={{ color: "#d4a017", fontWeight: 700, fontSize: 14, fontFamily: "'Playfair Display',serif" }}>SDET</span>
+              <span style={{ color: "#d4a017", fontWeight: 700, fontSize: 14, fontFamily: "'Playfair Display',serif" }}>Heshvi Gurukul</span>
             </div>
             <button onClick={() => setMenuOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#fff", fontSize: 28, lineHeight: 1, padding: 4 }}>×</button>
           </div>
@@ -468,7 +468,7 @@ function LoginPage() {
           </div>
         </div>
         {/* Desktop nav links */}
-        <div className="sdet-nav-links" style={{ display: "flex", gap: 32 }}>
+        <div className="Heshvi Gurukul-nav-links" style={{ display: "flex", gap: 32 }}>
           {["About Us", "Courses", "Teachers", "Contact"].map(item => (
             <span key={item} onClick={() => setModal(item)}
               style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer" }}
@@ -479,7 +479,7 @@ function LoginPage() {
           ))}
         </div>
         {/* Mobile hamburger */}
-        <div className="sdet-hamburger" style={{ position: "relative" }}>
+        <div className="Heshvi Gurukul-hamburger" style={{ position: "relative" }}>
           <button onClick={() => setMenuOpen(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", flexDirection: "column", gap: 5 }}>
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
             <div style={{ width: 24, height: 2, background: "#fff", borderRadius: 2 }} />
@@ -489,11 +489,11 @@ function LoginPage() {
       </nav>
 
       {/* Desktop layout */}
-      <div className="sdet-desktop" style={{ position: "relative", zIndex: 2, display: "flex", flex: 1, flexDirection: "row", alignItems: "center", padding: "40px 48px", gap: 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
+      <div className="Heshvi Gurukul-desktop" style={{ position: "relative", zIndex: 2, display: "flex", flex: 1, flexDirection: "row", alignItems: "center", padding: "40px 48px", gap: 48, maxWidth: 1200, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 20, letterSpacing: 1 }}>EST. — BENGALURU</div>
           <h1 style={{ margin: "0 0 6px", fontSize: 42, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.15 }}>Sri Dayanidhi<br />Educational Trust</h1>
-          <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>SDET Learning Platform</h2>
+          <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>Heshvi Gurukul Learning Platform</h2>
           <p style={{ margin: "0 0 36px", color: "rgba(255,255,255,0.65)", fontSize: 15, lineHeight: 1.8, maxWidth: 420 }}>Empowering students across ICSE, ISC, CBSE and Karnataka State Board with expert-led Physics, Mathematics, Chemistry and more.</p>
           <div style={{ display: "flex", gap: 40 }}>
             {[["500+","Students"],["15+","Courses"],["3","Boards"]].map(([n,l]) => (
@@ -510,11 +510,11 @@ function LoginPage() {
       </div>
 
       {/* Mobile layout */}
-      <div className="sdet-mobile" style={{ position: "relative", zIndex: 2, padding: "20px 16px 32px", gap: 24, flex: 1 }}>
+      <div className="Heshvi Gurukul-mobile" style={{ position: "relative", zIndex: 2, padding: "20px 16px 32px", gap: 24, flex: 1 }}>
         <div>
           <div style={{ display: "inline-block", background: "rgba(212,160,23,0.15)", border: "1px solid rgba(212,160,23,0.4)", color: "#d4a017", fontSize: 11, padding: "5px 14px", borderRadius: 20, marginBottom: 12, letterSpacing: 1 }}>EST. — BENGALURU</div>
           <h1 style={{ margin: "0 0 6px", fontSize: 30, fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display',serif", lineHeight: 1.2 }}>Sri Dayanidhi<br/>Educational Trust</h1>
-          <h2 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>SDET Learning Platform</h2>
+          <h2 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 400, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>Heshvi Gurukul Learning Platform</h2>
           <div style={{ display: "flex", gap: 24, marginBottom: 8 }}>
             {[["500+","Students"],["15+","Courses"],["3","Boards"]].map(([n,l]) => (
               <div key={l}><div style={{ fontSize: 22, fontWeight: 900, color: "#d4a017", fontFamily: "'Playfair Display',serif" }}>{n}</div><div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{l}</div></div>
@@ -528,8 +528,8 @@ function LoginPage() {
       </div>
 
       {/* Footer — desktop */}
-      <div className="sdet-desktop" style={{ position: "relative", zIndex: 2, display: "flex", borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 48px", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>sdet-platform.vercel.app</span>
+      <div className="Heshvi Gurukul-desktop" style={{ position: "relative", zIndex: 2, display: "flex", borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 48px", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>heshvigurukul.org</span>
         <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>Physics · Mathematics · Chemistry · Biology · English</span>
       </div>
     </div>
@@ -680,7 +680,7 @@ function PhoneCollect({ uid, onDone }) {
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>{icons.logo(44)}</div>
-          <h2 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 4px", fontSize: 22 }}>Welcome to SDET! 🎉</h2>
+          <h2 style={{ color: C.navy, fontFamily: "'Playfair Display',serif", margin: "0 0 4px", fontSize: 22 }}>Welcome to Heshvi Gurukul! 🎉</h2>
           <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>Complete your profile to get started</p>
         </div>
 
@@ -779,7 +779,7 @@ function PhoneCollect({ uid, onDone }) {
               <button onClick={() => setStep(2)} style={{ ...btn("outline"), flex: 1, justifyContent: "center" }}>← Back</button>
               <button onClick={save} disabled={!step3Valid || saving}
                 style={{ ...btn("gold"), flex: 2, justifyContent: "center", opacity: step3Valid ? 1 : 0.5 }}>
-                {saving ? "Saving…" : "🎉 Join SDET!"}
+                {saving ? "Saving…" : "🎉 Join Heshvi Gurukul!"}
               </button>
             </div>
           </div>
@@ -839,7 +839,7 @@ function TeacherApp({ profile, onRefresh }) {
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 20, background: C.navy, height: 52, display: "flex", alignItems: "center", padding: "0 16px", justifyContent: "space-between", borderBottom: "1px solid #ffffff18" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {icons.logo(24)}
-            <span style={{ color: "#f59e0b", fontWeight: 900, fontSize: 15, fontFamily: "'Playfair Display',serif" }}>SDET</span>
+            <span style={{ color: "#f59e0b", fontWeight: 900, fontSize: 15, fontFamily: "'Playfair Display',serif" }}>Heshvi Gurukul</span>
           </div>
           <div style={{ color: "#94a3b8", fontSize: 12 }}>{profile.full_name.split(" ")[0]}</div>
           <button onClick={logout} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}>{icons.logout(18)}</button>
@@ -863,7 +863,7 @@ function TeacherApp({ profile, onRefresh }) {
         <div style={{ padding: "0 24px 28px", borderBottom: "1px solid #ffffff18" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
             {icons.logo(32)}
-            <span style={{ color: "#f59e0b", fontWeight: 900, fontSize: 18, fontFamily: "'Playfair Display',serif" }}>SDET</span>
+            <span style={{ color: "#f59e0b", fontWeight: 900, fontSize: 18, fontFamily: "'Playfair Display',serif" }}>Heshvi Gurukul</span>
           </div>
           <div style={{ color: "#94a3b8", fontSize: 11, marginTop: 2 }}>Sri Dayanidhi Educational Trust</div>
         </div>
@@ -1087,10 +1087,10 @@ function WorksheetsView({ worksheets, courses, profile, onRefresh }) {
         for (const student of students) {
           await sendEmail(
             student.email,
-            `📚 New Worksheet: ${preview.topic} — SDET`,
+            `📚 New Worksheet: ${preview.topic} — Heshvi Gurukul`,
             `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
               <div style="background:#1a2744;padding:20px;border-radius:12px 12px 0 0;text-align:center">
-                <h2 style="color:#d4a017;margin:0;font-size:20px">SDET Learning Platform</h2>
+                <h2 style="color:#d4a017;margin:0;font-size:20px">Heshvi Gurukul Learning Platform</h2>
                 <p style="color:#94a3b8;margin:8px 0 0;font-size:13px">Sri Dayanidhi Educational Trust</p>
               </div>
               <div style="background:#fff;border:1px solid #e2e8f0;padding:28px;border-radius:0 0 12px 12px">
@@ -1102,9 +1102,9 @@ function WorksheetsView({ worksheets, courses, profile, onRefresh }) {
                 <p style="color:#374151;margin:0 0 12px;font-size:14px"><strong>Questions:</strong></p>
                 <ol style="color:#374151;font-size:14px;line-height:1.7;padding-left:20px">${questionsHtml}</ol>
                 <div style="margin-top:24px;text-align:center">
-                  <a href="https://sdet-platform.vercel.app" style="background:#1a2744;color:#d4a017;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Platform & Submit</a>
+                  <a href="https://heshvigurukul.org" style="background:#1a2744;color:#d4a017;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Platform & Submit</a>
                 </div>
-                <p style="color:#94a3b8;font-size:12px;margin-top:20px;text-align:center">SDET — Guiding Students Towards Confidence, Knowledge & Success</p>
+                <p style="color:#94a3b8;font-size:12px;margin-top:20px;text-align:center">Heshvi Gurukul — Guiding Students Towards Confidence, Knowledge & Success</p>
               </div>
             </div>`
           );
@@ -1241,10 +1241,10 @@ function SubmissionsView({ submissions, worksheets, onRefresh }) {
         const scoreColor = parsed.score >= 7 ? "#059669" : parsed.score >= 5 ? "#d97706" : "#dc2626";
         await sendEmail(
           studentEmail,
-          `📊 Your Score: ${parsed.score}/10 — ${ws?.topic} — SDET`,
+          `📊 Your Score: ${parsed.score}/10 — ${ws?.topic} — Heshvi Gurukul`,
           `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
             <div style="background:#1a2744;padding:20px;border-radius:12px 12px 0 0;text-align:center">
-              <h2 style="color:#d4a017;margin:0;font-size:20px">SDET Learning Platform</h2>
+              <h2 style="color:#d4a017;margin:0;font-size:20px">Heshvi Gurukul Learning Platform</h2>
               <p style="color:#94a3b8;margin:8px 0 0;font-size:13px">Sri Dayanidhi Educational Trust</p>
             </div>
             <div style="background:#fff;border:1px solid #e2e8f0;padding:28px;border-radius:0 0 12px 12px">
@@ -1258,9 +1258,9 @@ function SubmissionsView({ submissions, worksheets, onRefresh }) {
                 <p style="color:#065f46;margin:0;font-size:14px;line-height:1.7"><strong>Teacher Feedback:</strong><br/>${parsed.feedback}</p>
               </div>
               <div style="margin-top:24px;text-align:center">
-                <a href="https://sdet-platform.vercel.app" style="background:#1a2744;color:#d4a017;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">View on Platform</a>
+                <a href="https://heshvigurukul.org" style="background:#1a2744;color:#d4a017;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">View on Platform</a>
               </div>
-              <p style="color:#94a3b8;font-size:12px;margin-top:20px;text-align:center">SDET — Guiding Students Towards Confidence, Knowledge & Success</p>
+              <p style="color:#94a3b8;font-size:12px;margin-top:20px;text-align:center">Heshvi Gurukul — Guiding Students Towards Confidence, Knowledge & Success</p>
             </div>
           </div>`
         );
@@ -1620,7 +1620,7 @@ function StudentApp({ profile, onRefresh }) {
       <header style={{ background: C.navy, padding: "0 16px", display: "flex", alignItems: "center", height: 56, gap: 12, position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {icons.logo(24)}
-          <span style={{ color: "#f59e0b", fontWeight: 900, fontFamily: "'Playfair Display',serif", fontSize: mob ? 15 : 18 }}>SDET</span>
+          <span style={{ color: "#f59e0b", fontWeight: 900, fontFamily: "'Playfair Display',serif", fontSize: mob ? 15 : 18 }}>Heshvi Gurukul</span>
         </div>
         {!mob && <nav style={{ display: "flex", gap: 4, marginLeft: "auto" }}>
           {[
@@ -1897,7 +1897,7 @@ function StudentProfile({ profile, onRefresh }) {
     subjects: profile.subjects || [],
     previous_marks: profile.previous_marks || "",
     learning_goals: profile.learning_goals || "",
-    heard_about_sdet: profile.heard_about_sdet || "",
+    heard_about_Heshvi Gurukul: profile.heard_about_Heshvi Gurukul || "",
   }));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -1926,7 +1926,7 @@ function StudentProfile({ profile, onRefresh }) {
       subjects: form.subjects,
       previous_marks: form.previous_marks,
       learning_goals: form.learning_goals,
-      heard_about_sdet: form.heard_about_sdet,
+      heard_about_Heshvi Gurukul: form.heard_about_Heshvi Gurukul,
     }).eq("id", profile.id);
     setSaving(false);
     setSaved(true);
@@ -2047,8 +2047,8 @@ function StudentProfile({ profile, onRefresh }) {
         <Field label="Learning Goals">
           <textarea key="goals" defaultValue={form.learning_goals} onBlur={e => set("learning_goals", e.target.value)} placeholder="What do you want to achieve? e.g. Score 90%+ in boards, understand Physics concepts..." rows={3} style={{ ...inp, resize: "vertical" }} />
         </Field>
-        <Field label="How did you hear about SDET?">
-          <select key="heard" defaultValue={form.heard_about_sdet} onChange={e => set("heard_about_sdet", e.target.value)} style={inp}>
+        <Field label="How did you hear about Heshvi Gurukul?">
+          <select key="heard" defaultValue={form.heard_about_Heshvi Gurukul} onChange={e => set("heard_about_Heshvi Gurukul", e.target.value)} style={inp}>
             <option value="">Select an option</option>
             <option>Friend / Classmate</option>
             <option>Parent / Family</option>
